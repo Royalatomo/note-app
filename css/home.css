@@ -4,7 +4,7 @@
 }
 
 /* Notes Container - Individual Notes */
-.notes-area .note {
+.note {
     position: relative;
     margin-bottom: 3rem;
     border-radius: 1rem;
@@ -12,7 +12,7 @@
 }
 
 /* Note - Head (Title, Label, Icon) Container */
-.notes-area .note .note-head {
+.note .note-head {
     border-bottom: 2px solid #0000004f;
     display: flex;
     padding: 1rem 0;
@@ -21,7 +21,7 @@
 }
 
 /* Note - Title */
-.notes-area .note .note-head .title {
+.note .note-head .title {
     font-family: 'Merriweather', sans-serif;
     letter-spacing: 0.1rem;
     margin: 0 auto;
@@ -31,14 +31,14 @@
 }
 
 /* Note - More Icon */
-.notes-area .note .note-head .more-icon {
+.note .note-head .more-icon {
     margin-right: 1rem;
     font-size: 1.3rem;
     margin-left: 0.5rem;
 }
 
 /* Note - Text Area */
-.notes-area .note .note-body {
+.note .note-body {
     padding: 1rem 1.2rem;
     padding-bottom: 1rem;
     line-height: 1.3;
@@ -56,7 +56,7 @@
 }
 
 /* Note - Label Container */
-.notes-area .note .note-body .label {
+.note .note-body .label {
     border: 1px solid #19191966;
     padding: 0 0.8rem;
     background: white;
@@ -70,18 +70,18 @@
     box-shadow: 0px 0px 4px black;
 }
 
-.notes-area .note .note-body .label:hover {
+.note .note-body .label:hover {
     position: relative;
     background: #000000cf;
     color: #5e5c5c;
 }
 
-.notes-area .note .note-body .label .close-button{
+.note .note-body .label .close-button{
     display: none;
     transition: var(--transition);
 }
 
-.notes-area .note .note-body .label:hover .close-button{
+.note .note-body .label:hover .close-button{
     display: block;
     cursor: pointer;
     position: absolute;
@@ -90,3 +90,27 @@
     margin-right: 0.5rem;
     color: white;
 }
+
+
+
+.note-view-area{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    background: #00000052;
+    padding: 1rem 1rem;
+    z-index: 2;
+    /* place-content: center; */
+    display: flex;
+    align-items: center;
+}
+
+.note-view-area .note{
+    background: whitesmoke;
+    /* margin: 0; */
+    padding-bottom: 0.5rem;
+    margin: 0;
+}
+
