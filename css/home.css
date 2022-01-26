@@ -1,0 +1,54 @@
+/* Notes - Container */
+.notes-area {
+    padding: 5rem 3rem;
+}
+
+/* Notes Container - Individual Notes */
+.notes-area .note {
+    border: 2px solid black;
+    position: relative;
+    margin-bottom: 3rem;
+    border-radius: 1rem;
+}
+
+/* Note - Head (Title, Label, Icon) Container */
+.notes-area .note .note-head {
+    border-bottom: 2px solid black;
+    display: flex;
+    padding: 1rem 0;
+    padding-top: 1.2rem;
+    padding-left: 1rem;
+}
+
+/* Note - Label Container */
+.notes-area .note .note-head .label {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    border: 2px solid black;
+    padding: 0 0.8rem;
+    background: white;
+    font-weight: bold;
+    border-radius: 0.5rem;
+}
+
+/* Note - Title */
+.notes-area .note .note-head .title {
+    font-family: 'Merriweather', sans-serif;
+    letter-spacing: 0.1rem;
+    margin: 0 auto;
+    line-height: 1.4;
+}
+
+/* Note - More Icon */
+.notes-area .note .note-head .more-icon {
+    margin-right: 1rem;
+    font-size: 1.3rem;
+}
+
+/* Note - Text Area */
+.notes-area .note .note-body {
+    padding: 1.5rem 1.2rem;
+    line-height: 1.3;
+}

@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
+
+/* Hamburger Icon */
+.hamburger-icon {
+    font-size: 2rem;
+    position: fixed;
+    right: 0;
+    margin-right: 2rem;
+    margin-top: 1rem;
+    background-color: green;
+    padding: 0.5rem 0.9rem;
+    border-radius: 50%;
+    color: white;
+    border: 3px solid black;
+    z-index: 2;
+}
+
+.hamburger-icon:hover {
+    cursor: pointer;
+}
+
+
+/* Hamburger Menu */
+.hamburger-menu {
+    display: none;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    text-align: center;
+    padding-top: 4rem;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.1rem;
+    transform: translateX(-100%);
+    transition: var(--transition);
+    z-index: 3;
+}
+
+.show-menu {
+    transform: translateX(0);
+}
+
+
+/* Hamburger Menu - Close Icon */
+.hamburger-menu .hamburger-menu-close {
+    font-size: 3rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 1.5rem;
+    margin-top: 1rem;
+    color: red;
+    border-radius: 50%;
+}
+
+.hamburger-menu .hamburger-menu-close:hover {
+    cursor: pointer;
+}
+
+
+/* Site Logo - Image Container */
+.hamburger-menu .site-logo {
+    width: fit-content;
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid red;
+    margin-bottom: 2rem;
+}
+
+/* Site Logo - Image */
+.hamburger-menu .site-logo img {
+    width: 7rem;
+    display: block;
+}
+
+/* Hamburger Menu - Link Container */
+.hamburger-menu .hamburger-menu-links {
+    width: fit-content;
+    margin: 0 auto;
+    max-height: 400px;
+    overflow-y: scroll;
+    padding-right: 1rem;
+    text-align: left;
+}
+
+/* Hamburger Menu - Srollbar */
+.hamburger-menu .hamburger-menu-links::-webkit-scrollbar {
+    width: 0.4rem;
+}
+
+/* Hamburger Menu - Srollbar Thumb */
+.hamburger-menu .hamburger-menu-links::-webkit-scrollbar-thumb {
+    background-color: #ff8000;
+    border-radius: 100rem;
+}
+
+/* Hamburger Menu - Link  */
+.hamburger-menu .hamburger-menu-links .link {
+    list-style: none;
+    font-size: 1.5rem;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+/* Hamburger Menu - Link Icons  */
+.hamburger-menu .hamburger-menu-links .link .icon {
+    font-size: 1.8rem;
+    color: rgb(77, 211, 0);
+}
