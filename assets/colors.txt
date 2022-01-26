@@ -1,0 +1,26 @@
+---- NOTES -----
+#d0ebff
+9CF6F6
+#ffc9cb
+#EDD892
+C9CEBD
+#add4d9
+E2C044
+#a2e5ff
+#7ad797
+#daa3db
+
+
+----- NOTES LABEL -------
+#7CDEDC - C: #000000bf
+##EF767A
+#7AFDD6
+antiquewhite
+
+#B81365 - white
+055864
+#60993E
+#90323D
+##312F2F
+#9A031E
+#14453D

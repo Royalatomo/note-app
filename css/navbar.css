@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
 
 
 /* Hamburger Icon */
@@ -9,16 +8,18 @@
     right: 0;
     margin-right: 2rem;
     margin-top: 1rem;
-    background-color: green;
+    background-color: #07A0C3;
     padding: 0.5rem 0.9rem;
     border-radius: 50%;
     color: white;
-    border: 3px solid black;
+    border: 3px solid #0D1B2A;
     z-index: 2;
 }
 
 .hamburger-icon:hover {
     cursor: pointer;
+    background-color: #00d0ff;
+    box-shadow: 0px 0px 10px #545454;
 }
 
 
@@ -57,6 +58,7 @@
 
 .hamburger-menu .hamburger-menu-close:hover {
     cursor: pointer;
+    color: #a30101;
 }
 
 
@@ -110,4 +112,22 @@
 .hamburger-menu .hamburger-menu-links .link .icon {
     font-size: 1.8rem;
     color: rgb(77, 211, 0);
+}
+.hamburger-menu .hamburger-menu-links .label-list .icon{
+    color: #F86624
+}
+.hamburger-menu .hamburger-menu-links .archive-label .icon{
+    color: #607d8b;
+}
+
+.hamburger-menu .hamburger-menu-links .edit-label .icon{
+    color: #00a8d6;
+}
+
+.hamburger-menu .hamburger-menu-links .trash-label .icon{
+    color: #e91d1d;
+}
+
+.hamburger-menu .hamburger-menu-links .link a:hover{
+    font-weight: bolder;
 }
