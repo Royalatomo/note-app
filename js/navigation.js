@@ -1,39 +1,50 @@
-window.onload = () => {
-    hamburgerMenu.style.display = "block";
-};
-
+// Remove Labels From Navigation Menu
 function unPopulateLabel() {
+    // Get All Labels
     const labels = document.querySelectorAll(".label-list");
-    if (labels.length > 0) {
+    if (labels) {
+        // Remove All Labels
         labels.forEach((item) => {
             item.remove();
         });
     }
 }
 
+
+// Add Labels To Navigation Menu
 function populateLabel() {
+    // First remove all labels (if present)
     unPopulateLabel();
 
+    // Get All Labels
     const labels = JSON.parse(localStorage.getItem("labels"));
 
-    if (labels.length > 0) {
+    // Append all labels to the main navigation
+    if (labels) {
         labels.forEach((label) => {
+            // create main "li" tag - Main Parent
             const labelElementList = document.createElement("li");
             labelElementList.className = "link label-list";
 
+            // create link "a" tag
             const labelElementLink = document.createElement("a");
             labelElementLink.setAttribute("href", "#");
 
+            // create tag for icon
             const labelElementLogo = document.createElement("i");
             labelElementLogo.className = "icon fas fa-tag";
 
+            // create text with label
             const labelElementText = document.createTextNode(` ${label}`);
 
+            // Append text and icon in "a" (link tag)
             labelElementLink.appendChild(labelElementLogo);
             labelElementLink.appendChild(labelElementText);
 
+            // Append link "a" tag to main "li" tag
             labelElementList.appendChild(labelElementLink);
 
+            // Append main link tag to navigation menu
             document
                 .querySelector(".hamburger-menu-links")
                 .insertBefore(
@@ -44,46 +55,35 @@ function populateLabel() {
     }
 }
 
-const hamburgerIcon = document.querySelector(".hamburger-icon");
-const hamburgerMenu = document.querySelector(".hamburger-menu");
-const hamburgerCloseIcon = document.querySelector(".hamburger-menu-close");
+
+// Hamburger:-
+const hamburgerMenu = document.querySelector(".hamburger-menu"); // Menu
+const hamburgerIcon = document.querySelector(".hamburger-icon"); // Icon
+const hamburgerCloseIcon = document.querySelector(".hamburger-menu-close"); // Close Button
+
+// Notes Holding Div
 const noteArea = document.querySelector(".notes-area");
 
+
+// Hamburger Menu starting transition hide
+window.onload = () => {
+    hamburgerMenu.style.display = "block";
+};
+
+// Hamburger Menu Icon (Clicked) - hide notes-area (to fit menu nicely)
 hamburgerIcon.addEventListener("click", () => {
     hamburgerMenu.classList.add("show-menu");
-    noteArea.style.display = "none";
+    // Wait for the transition (hamburger menu)
+    setTimeout(() => {
+        noteArea.style.display = "none";
+    }, 300);
 });
 
+// Hamburger Menu Close Icon (Clicked) - show notes-area
 hamburgerCloseIcon.addEventListener("click", () => {
     hamburgerMenu.classList.remove("show-menu");
     noteArea.style.display = "block";
 });
 
-localStorage.setItem(
-    "labels",
-    JSON.stringify(["label 1", "label 2", "label 3"])
-);
 
 populateLabel();
-
-
-// const notes = [
-//     {
-//         id: '100',
-//         title: "This is title",
-//         content: "Hello I am Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet unde eligendi repellat, dolorum eaque minus maiores eveniet deserunt illum in dolorem necessitatibus similique iusto vero enim, voluptas inventore!",
-//         label: "Label 1"
-//     },
-//     {
-//         id: '101',
-//         title: "This is title",
-//         content: "Hello I am Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet unde eligendi repellat, dolorum eaque minus maiores eveniet deserunt illum in dolorem necessitatibus similique iusto vero enim, voluptas inventore!",
-//         label: "Label 1"
-//     },
-//     {
-//         id: '102',
-//         title: "This is title",
-//         content: "Hello I am Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet unde eligendi repellat, dolorum eaque minus maiores eveniet deserunt illum in dolorem necessitatibus similique iusto vero enim, voluptas inventore!",
-//         label: "Label 1"
-//     }
-// ]
