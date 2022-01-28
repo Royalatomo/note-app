@@ -75,14 +75,18 @@ hamburgerIcon.addEventListener("click", () => {
     hamburgerMenu.classList.add("show-menu");
     // Wait for the transition (hamburger menu)
     setTimeout(() => {
-        noteArea.style.display = "none";
+        if (noteArea){
+            noteArea.style.display = "none";
+        }
     }, 300);
 });
 
 // Hamburger Menu Close Icon (Clicked) - show notes-area
 hamburgerCloseIcon.addEventListener("click", () => {
     hamburgerMenu.classList.remove("show-menu");
-    noteArea.style.display = "block";
+    if (noteArea){
+        noteArea.style.display = "block";
+    }
 });
 
 

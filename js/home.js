@@ -13,10 +13,8 @@ function checkLabelClicked(list) {
     return status;
 }
 
-
 // Return's HTML for individual note viewing
 function returnNoteViewHTML(note) {
-    
     // Return's HTML for "labels section"
     function getLabels() {
         let fullLabelHTML = "";
@@ -25,7 +23,6 @@ function returnNoteViewHTML(note) {
         });
         return fullLabelHTML;
     }
-
 
     // Get Selected Note Title
     const title = note.querySelector(".title").textContent;
@@ -47,8 +44,11 @@ function returnNoteViewHTML(note) {
             </div>
             <div class="note-body">
                 <p class="text">${content.trim()}</p>
-                ${// if labels present in note
-                    labels?`<div class="note-labels">${getLabels()}</div>`:''
+                ${
+                    // if labels present in note
+                    labels
+                        ? `<div class="note-labels">${getLabels()}</div>`
+                        : ""
                 }
             </div>
         </div>
@@ -59,48 +59,55 @@ function returnNoteViewHTML(note) {
     return section;
 }
 
-
 // Get all notes
-const notes = document.querySelector(".notes-area").querySelectorAll(".note");
+let notes = document.querySelector(".notes-area");
 
-// Make every note clickable for viewing
-notes.forEach((note) => {
-    note.addEventListener("click", (e) => {
-        // Get the exact clicked element
-        const labelClicked = checkLabelClicked(
-            e.target.parentElement.classList
-        );
+if (notes) {
+    notes = notes.querySelectorAll(".note");
+    if (notes) {
+        // Make every note clickable for viewing
+        notes.forEach((note) => {
+            note.addEventListener("click", (e) => {
+                // Get the exact clicked element
+                const labelClicked = checkLabelClicked(
+                    e.target.parentElement.classList
+                );
 
-        // If the clicked element is not label
-        if (!labelClicked) {
+                // If the clicked element is not label
+                if (!labelClicked) {
+                    // Show clicked note
+                    document.body.appendChild(
+                        returnNoteViewHTML(e.currentTarget)
+                    );
 
-            // Show clicked note
-            document.body.appendChild(returnNoteViewHTML(e.currentTarget));
-            
-            // Freeze scrolling
-            document.querySelector("body").style.width = "100vw";
-            document.querySelector("body").style.height = "100vh";
-            document.querySelector("body").style.overflow = "hidden";
+                    // Freeze scrolling
+                    document.querySelector("body").style.width = "100vw";
+                    document.querySelector("body").style.height = "100vh";
+                    document.querySelector("body").style.overflow = "hidden";
 
-            // If clicked at note viewing Div
-            document.querySelector(".note-view-area").addEventListener("click", (e) => {
-                
-                // If note clicked on the note (background clicked)
-                if (e.target.classList.contains("note-view-area")) {
-                    
-                    // remove note viewer
-                    e.target.remove();
+                    // If clicked at note viewing Div
+                    document
+                        .querySelector(".note-view-area")
+                        .addEventListener("click", (e) => {
+                            // If note clicked on the note (background clicked)
+                            if (e.target.classList.contains("note-view-area")) {
+                                // remove note viewer
+                                e.target.remove();
 
-                    // Unfreeze scrolling
-                    document.querySelector("body").style.width = "fit-content";
-                    document.querySelector("body").style.height = "fit-content";
-                    document.querySelector("body").style.overflow = "visible";
+                                // Unfreeze scrolling
+                                document.querySelector("body").style.width =
+                                    "fit-content";
+                                document.querySelector("body").style.height =
+                                    "fit-content";
+                                document.querySelector("body").style.overflow =
+                                    "visible";
+                            }
+                        });
                 }
             });
-        }
-    });
-});
-
+        });
+    }
+}
 
 // const notesLabels = document.querySelectorAll(
 //     ".note-body .label .close-button"
