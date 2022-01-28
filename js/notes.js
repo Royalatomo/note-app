@@ -27,7 +27,7 @@ function Note(title = "", content = "", labels = []) {
             });
 
             if (!isNotePresent) {
-                newNotes.push({
+                newNotes.unshift({
                     id: this.id,
                     title: this.title,
                     content: this.content,
@@ -36,9 +36,14 @@ function Note(title = "", content = "", labels = []) {
                     isTrash: this.isTrash,
                 });
             }
-
             newNotes = JSON.stringify(newNotes);
             localStorage.setItem("notes", newNotes);
+
+            if (isNotePresent) {
+                updateNoteData(this.id);
+            } else {
+                populateNotes();
+            }
         } else {
             localStorage.setItem(
                 "notes",
@@ -47,11 +52,13 @@ function Note(title = "", content = "", labels = []) {
                         id: this.id,
                         title: this.title,
                         content: this.content,
+                        labels: this.labels,
                         isArchive: this.isArchive,
                         isTrash: this.isTrash,
                     },
                 ])
             );
+            populateNotes();
         }
     };
 
@@ -88,11 +95,11 @@ function Note(title = "", content = "", labels = []) {
 // Populate Notes into notes area
 function populateNotes() {
     function returnNoteHTML(note) {
-        function getLabelsHTML(){
-            let html = '';
+        function getLabelsHTML() {
+            let html = "";
             note.labels.forEach((label) => {
-                html += `<span class="label"><p>${label}</p><span class="close-button"><i class="fas fa-times"></i></span></span>`
-            })
+                html += `<span class="label"><p>${label}</p><span class="close-button"><i class="fas fa-times"></i></span></span>`;
+            });
             return html;
         }
 
@@ -104,27 +111,73 @@ function populateNotes() {
                 </div>
                 <div class="note-body">
                     <p class="text">${note.content}</p>
-                    ${note.labels?`<div class="note-labels">${getLabelsHTML()}</div>`:''}
+                    ${
+                        note.labels
+                            ? `<div class="note-labels">${getLabelsHTML()}</div>`
+                            : ""
+                    }
                 </div>
             </div>`;
         return html;
     }
 
-    const notes = JSON.parse(localStorage.getItem('notes'));
-    if (notes){
-        let allNotesHTML = ''
+    const noteArea = document.querySelectorAll(".note-area");
+    if (noteArea) {
+        noteArea.innerHTML = "";
+    }
+    const notes = JSON.parse(localStorage.getItem("notes"));
+    if (notes) {
+        let allNotesHTML = "";
         notes.forEach((note) => {
             allNotesHTML += returnNoteHTML(note);
-        })
+        });
 
-        const noteAreaSection = document.createElement('section');
-        noteAreaSection.classList.add('notes-area');
-        noteAreaSection.innerHTML = allNotesHTML;
-        
-        document.body.appendChild(noteAreaSection)
+        if (!document.querySelector(".notes-area")) {
+            const noteAreaSection = document.createElement("section");
+            noteAreaSection.classList.add("notes-area");
+            noteAreaSection.innerHTML = allNotesHTML;
+            document.body.appendChild(noteAreaSection);
+        } else {
+            document.querySelector(".notes-area").innerHTML = allNotesHTML;
+        }
     }
+    makeNotesViewable();
 }
 
 // throught id on save grab note from localstorage and change just that note (.textContent)
+function updateNoteData(id) {
+    const notes = JSON.parse(localStorage.getItem("notes"));
+    const note = notes.filter((note) => note.id == id)[0];
+    if (note) {
+        function getLabelsHTML() {
+            if (note.labels) {
+                const noteLabelContainer = document.createElement("div");
+                noteLabelContainer.classList.add("note-labels");
+
+                let html = "";
+                note.labels.forEach((label) => {
+                    html += `<span class="label"><p>${label}</p><span class="close-button"><i class="fas fa-times"></i></span></span>`;
+                });
+
+                noteLabelContainer.innerHTML = html;
+                return noteLabelContainer;
+            }
+            return "";
+        }
+
+        const existingNote = document.getElementById(note.id);
+        if (existingNote) {
+            existingNote.querySelector(".title").textContent = note.title;
+            existingNote.querySelector(".text").textContent = note.content;
+            existingNote.querySelector(".note-labels").remove();
+            console.log(getLabelsHTML());
+            existingNote
+                .querySelector(".note-body")
+                .appendChild(getLabelsHTML());
+        }
+    }
+    makeNotesViewable();
+}
 
 // make more-option button functionable
+populateNotes();

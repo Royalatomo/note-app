@@ -59,53 +59,62 @@ function returnNoteViewHTML(note) {
     return section;
 }
 
-// Get all notes
-let notes = document.querySelector(".notes-area");
+function makeNotesViewable() {
+    // Get all notes
+    let notes = document.querySelector(".notes-area");
 
-if (notes) {
-    notes = notes.querySelectorAll(".note");
     if (notes) {
-        // Make every note clickable for viewing
-        notes.forEach((note) => {
-            note.addEventListener("click", (e) => {
-                // Get the exact clicked element
-                const labelClicked = checkLabelClicked(
-                    e.target.parentElement.classList
-                );
-
-                // If the clicked element is not label
-                if (!labelClicked) {
-                    // Show clicked note
-                    document.body.appendChild(
-                        returnNoteViewHTML(e.currentTarget)
+        notes = notes.querySelectorAll(".note");
+        if (notes) {
+            // Make every note clickable for viewing
+            notes.forEach((note) => {
+                note.addEventListener("click", (e) => {
+                    // Get the exact clicked element
+                    const labelClicked = checkLabelClicked(
+                        e.target.parentElement.classList
                     );
 
-                    // Freeze scrolling
-                    document.querySelector("body").style.width = "100vw";
-                    document.querySelector("body").style.height = "100vh";
-                    document.querySelector("body").style.overflow = "hidden";
+                    // If the clicked element is not label
+                    if (!labelClicked) {
+                        // Show clicked note
+                        document.body.appendChild(
+                            returnNoteViewHTML(e.currentTarget)
+                        );
 
-                    // If clicked at note viewing Div
-                    document
-                        .querySelector(".note-view-area")
-                        .addEventListener("click", (e) => {
-                            // If note clicked on the note (background clicked)
-                            if (e.target.classList.contains("note-view-area")) {
-                                // remove note viewer
-                                e.target.remove();
+                        // Freeze scrolling
+                        document.querySelector("body").style.width = "100vw";
+                        document.querySelector("body").style.height = "100vh";
+                        document.querySelector("body").style.overflow =
+                            "hidden";
 
-                                // Unfreeze scrolling
-                                document.querySelector("body").style.width =
-                                    "fit-content";
-                                document.querySelector("body").style.height =
-                                    "fit-content";
-                                document.querySelector("body").style.overflow =
-                                    "visible";
-                            }
-                        });
-                }
+                        // If clicked at note viewing Div
+                        document
+                            .querySelector(".note-view-area")
+                            .addEventListener("click", (e) => {
+                                // If note clicked on the note (background clicked)
+                                if (
+                                    e.target.classList.contains(
+                                        "note-view-area"
+                                    )
+                                ) {
+                                    // remove note viewer
+                                    e.target.remove();
+
+                                    // Unfreeze scrolling
+                                    document.querySelector("body").style.width =
+                                        "fit-content";
+                                    document.querySelector(
+                                        "body"
+                                    ).style.height = "fit-content";
+                                    document.querySelector(
+                                        "body"
+                                    ).style.overflow = "visible";
+                                }
+                            });
+                    }
+                });
             });
-        });
+        }
     }
 }
 
@@ -118,3 +127,4 @@ if (notes) {
 //         e.currentTarget.parentElement.remove();
 //     });
 // });
+makeNotesViewable();
