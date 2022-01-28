@@ -56,10 +56,12 @@ function populateLabel() {
 }
 
 
-// Hamburger:-
-const hamburgerMenu = document.querySelector(".hamburger-menu"); // Menu
-const hamburgerIcon = document.querySelector(".hamburger-icon"); // Icon
-const hamburgerCloseIcon = document.querySelector(".hamburger-menu-close"); // Close Button
+// Hamburger Menu
+const hamburgerMenu = document.querySelector(".hamburger-menu");
+// Hamburger Icon
+const hamburgerIcon = document.querySelector(".hamburger-icon");
+// Hamburger Close Button
+const hamburgerCloseIcon = document.querySelector(".hamburger-menu-close");
 
 // Notes Holding Div
 const noteArea = document.querySelector(".notes-area");

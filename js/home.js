@@ -44,12 +44,9 @@ function returnNoteViewHTML(note) {
             </div>
             <div class="note-body">
                 <p class="text">${content.trim()}</p>
-                ${
-                    // if labels present in note
-                    labels
-                        ? `<div class="note-labels">${getLabels()}</div>`
-                        : ""
-                }
+                ${// if labels present in note
+        labels ? `<div class="note-labels">${getLabels()}</div>` : ""
+        }
             </div>
         </div>
     `;
@@ -59,6 +56,11 @@ function returnNoteViewHTML(note) {
     return section;
 }
 
+
+// any note is viewing currently
+let noteViewON = false;
+
+// On Note Click Open in Viewing mode
 function makeNotesViewable() {
     // Get all notes
     let notes = document.querySelector(".notes-area");
@@ -70,22 +72,18 @@ function makeNotesViewable() {
             notes.forEach((note) => {
                 note.addEventListener("click", (e) => {
                     // Get the exact clicked element
-                    const labelClicked = checkLabelClicked(
-                        e.target.parentElement.classList
-                    );
+                    const labelClicked = checkLabelClicked(e.target.parentElement.classList);
 
-                    // If the clicked element is not label
-                    if (!labelClicked) {
+                    // If the clicked element is not label/ If currently some note is being viewed
+                    if (!labelClicked && !noteViewON) {
                         // Show clicked note
-                        document.body.appendChild(
-                            returnNoteViewHTML(e.currentTarget)
-                        );
+                        document.body.appendChild(returnNoteViewHTML(e.currentTarget));
 
                         // Freeze scrolling
                         document.querySelector("body").style.width = "100vw";
                         document.querySelector("body").style.height = "100vh";
-                        document.querySelector("body").style.overflow =
-                            "hidden";
+                        document.querySelector("body").style.overflow = "hidden";
+                        noteViewON = true;
 
                         // If clicked at note viewing Div
                         document
@@ -93,22 +91,17 @@ function makeNotesViewable() {
                             .addEventListener("click", (e) => {
                                 // If note clicked on the note (background clicked)
                                 if (
-                                    e.target.classList.contains(
-                                        "note-view-area"
-                                    )
+                                    e.target.classList.contains("note-view-area")
                                 ) {
                                     // remove note viewer
                                     e.target.remove();
 
                                     // Unfreeze scrolling
-                                    document.querySelector("body").style.width =
-                                        "fit-content";
-                                    document.querySelector(
-                                        "body"
-                                    ).style.height = "fit-content";
-                                    document.querySelector(
-                                        "body"
-                                    ).style.overflow = "visible";
+                                    document.querySelector("body").style.width = "fit-content";
+                                    document.querySelector("body").style.height = "fit-content";
+                                    document.querySelector("body").style.overflow = "visible";
+
+                                    noteViewON = false;
                                 }
                             });
                     }
