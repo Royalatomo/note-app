@@ -13,8 +13,10 @@ function checkLabelClicked(list) {
     return status;
 }
 
+
 // Return's HTML for individual note viewing
 function returnNoteViewHTML(note) {
+
     // Return's HTML for "labels section"
     function getLabels() {
         let fullLabelHTML = "";
@@ -27,7 +29,7 @@ function returnNoteViewHTML(note) {
     // Get Selected Note Title
     const title = note.querySelector(".title").textContent;
     // Get Selected Note Content
-    const content = note.querySelector(".text").textContent; // Get Selected Note Content
+    const content = note.querySelector(".text").textContent;
     // Get Selected Note Labels
     const labels = Array.from(note.querySelectorAll(".label"));
 
@@ -39,11 +41,11 @@ function returnNoteViewHTML(note) {
     const html = `
     <div class="note">
             <div class="note-head">
-                <h4 class="title">${title.trim()}</h4>
+                <h4 contenteditable="true" class="title">${title.trim()}</h4>
                 <span class="more-icon"><i class="fas fa-ellipsis-v"></i></span>
             </div>
             <div class="note-body">
-                <p class="text">${content.trim()}</p>
+                <p contenteditable="true" class="text">${content.trim()}</p>
                 ${// if labels present in note
         labels ? `<div class="note-labels">${getLabels()}</div>` : ""
         }
@@ -65,6 +67,18 @@ function makeNotesViewable() {
     // Get all notes
     let notes = document.querySelector(".notes-area");
 
+    // When Ever Title/Content is edited
+    function onEditSaveNote(noteID) {
+        const noteView = document.querySelector('.note-view-area');
+        if (noteView) {
+            noteView.addEventListener('input', () => {
+                const note = new Note(noteView.querySelector('.title').textContent, noteView.querySelector('.text').textContent, Array.from(noteView.querySelectorAll('.label')).map((label) => { return label.textContent }))
+                note.id = noteID;
+                note.save();
+            })
+        }
+    }
+
     if (notes) {
         notes = notes.querySelectorAll(".note");
         if (notes) {
@@ -78,32 +92,31 @@ function makeNotesViewable() {
                     if (!labelClicked && !noteViewON) {
                         // Show clicked note
                         document.body.appendChild(returnNoteViewHTML(e.currentTarget));
+                        // make remove label button workable (for this note id)
+                        makeRemoveLabel(e.currentTarget.id)
 
                         // Freeze scrolling
                         document.querySelector("body").style.width = "100vw";
                         document.querySelector("body").style.height = "100vh";
                         document.querySelector("body").style.overflow = "hidden";
                         noteViewON = true;
+                        onEditSaveNote(e.currentTarget.id);
 
                         // If clicked at note viewing Div
-                        document
-                            .querySelector(".note-view-area")
-                            .addEventListener("click", (e) => {
-                                // If note clicked on the note (background clicked)
-                                if (
-                                    e.target.classList.contains("note-view-area")
-                                ) {
-                                    // remove note viewer
-                                    e.target.remove();
+                        document.querySelector(".note-view-area").addEventListener("click", (e) => {
+                            // If note clicked on the note (background clicked)
+                            if (e.target.classList.contains("note-view-area")) {
+                                // remove note viewer
+                                e.target.remove();
 
-                                    // Unfreeze scrolling
-                                    document.querySelector("body").style.width = "fit-content";
-                                    document.querySelector("body").style.height = "fit-content";
-                                    document.querySelector("body").style.overflow = "visible";
+                                // Unfreeze scrolling
+                                document.querySelector("body").style.width = "fit-content";
+                                document.querySelector("body").style.height = "fit-content";
+                                document.querySelector("body").style.overflow = "visible";
 
-                                    noteViewON = false;
-                                }
-                            });
+                                noteViewON = false;
+                            }
+                        });
                     }
                 });
             });
@@ -111,13 +124,96 @@ function makeNotesViewable() {
     }
 }
 
-// const notesLabels = document.querySelectorAll(
-//     ".note-body .label .close-button"
-// );
 
-// notesLabels.forEach((label) => {
-//     label.addEventListener("click", (e) => {
-//         e.currentTarget.parentElement.remove();
-//     });
-// });
+// Function for deleting labels from the note
+function makeRemoveLabel(id = "") {
+
+    // Prompt for confiming user deletion
+    function promptRemove(tag) {
+
+        if (document.body.querySelector('.prompt')){
+            document.body.querySelector('.prompt').remove();
+        }
+
+        // main prompt div
+        const prompt = document.createElement('div');
+        prompt.classList.add('prompt');
+
+        prompt.innerHTML = `
+        <div class="msg-box">
+            <p class="msg">are you sure you want to remove <span>${tag}</span> tag?</p>
+            <div class="msg-button">
+                <button class="red">Yes</button>
+                <button class="green">No</button>
+            </div>
+        </div>`;
+
+        // append to body
+        document.body.appendChild(prompt);
+
+        // freeze scrolling
+        document.body.style.height = "100vh";
+        document.body.style.width = "100vw";
+        document.body.style.overflow = "hidden";
+    }
+
+    // Remove Label from frontEnd and localStorage for that note
+    function removeLabelFromNote(currentLabel, note) {
+        // remove note from note (frontEnd)
+        currentLabel.remove();
+        // create note(same id) without the label tag which have to be deleted 
+        const newNote = new Note(note.querySelector('.title').textContent, note.querySelector('.text').textContent, Array.from(note.querySelectorAll('.label')).map((label) => { return label.textContent }));
+        // if id already given (noteView - REMOVE) / else (Home - REMOVE)
+        newNote.id = id ? id : note.id;
+        // save changes
+        newNote.save();
+    }
+
+
+    // Get all remove label buttons
+    const notesLabels = document.querySelectorAll(
+        ".note-body .label .close-button"
+    );
+
+    // addEventListener to all Remove Buttons
+    notesLabels.forEach((label) => {
+        label.addEventListener("click", (e) => {
+
+            // Label for which the button is clicked
+            const currentLabel = e.target.parentElement.parentElement;
+            // Note in which that label is
+            const note = currentLabel.parentElement.parentElement.parentElement;
+
+            // Get User Confirmation
+            promptRemove(currentLabel.textContent);
+
+            // If User Wants to Remove (Confirmation Done)
+            document.querySelector('.prompt .red').addEventListener('click', () => {
+                // Remove Prompt
+                document.querySelector('.prompt').remove();
+
+                // Unfreeze scroll
+                document.body.style.height = "fit-content";
+                document.body.style.width = "fit-content";
+                document.body.style.overflow = "visible";
+                // Remove label from note
+                removeLabelFromNote(currentLabel, note);
+            })
+
+            // If user doesn't want to Remove (Confirmation Done)
+            document.querySelector('.prompt .green').addEventListener('click', () => {
+                // Remove Prompt
+                document.querySelector('.prompt').remove();
+
+                // Unfreeze scroll
+                document.body.style.height = "fit-content";
+                document.body.style.width = "fit-content";
+                document.body.style.overflow = "visible";
+            })
+        });
+    });
+}
+
+
+// Display all notes which are present in localStorage
 makeNotesViewable();

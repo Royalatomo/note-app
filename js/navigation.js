@@ -63,8 +63,6 @@ const hamburgerIcon = document.querySelector(".hamburger-icon");
 // Hamburger Close Button
 const hamburgerCloseIcon = document.querySelector(".hamburger-menu-close");
 
-// Notes Holding Div
-const noteArea = document.querySelector(".notes-area");
 
 
 // Hamburger Menu starting transition hide
@@ -74,10 +72,13 @@ window.onload = () => {
 
 // Hamburger Menu Icon (Clicked) - hide notes-area (to fit menu nicely)
 hamburgerIcon.addEventListener("click", () => {
+    // Notes Holding Div
+    const noteArea = document.querySelector(".notes-area");
+
     hamburgerMenu.classList.add("show-menu");
     // Wait for the transition (hamburger menu)
     setTimeout(() => {
-        if (noteArea){
+        if (noteArea) {
             noteArea.style.display = "none";
         }
     }, 300);
@@ -85,8 +86,11 @@ hamburgerIcon.addEventListener("click", () => {
 
 // Hamburger Menu Close Icon (Clicked) - show notes-area
 hamburgerCloseIcon.addEventListener("click", () => {
+    // Notes Holding Div
+    const noteArea = document.querySelector(".notes-area");
+
     hamburgerMenu.classList.remove("show-menu");
-    if (noteArea){
+    if (noteArea) {
         noteArea.style.display = "block";
     }
 });

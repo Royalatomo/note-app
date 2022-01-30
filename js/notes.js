@@ -1,126 +1,129 @@
 // Note Object
-function Note(title = "", content = "", labels = []) {
-    
-    // Unique ID
-    this.id = String(Math.floor(Math.random() * 1000)) + String(new Date().getTime()) + String(Math.floor(Math.random() * 500));
-    this.title = title; // Note Title
-    this.content = content; // Note Content
-    this.labels = labels; // Note Labels
-    this.isTrash = false; // Is Note Trashed
-    this.isArchive = false; // Is Note Archived
+class Note {
+    constructor(title = "", content = "", labels = []) {
 
-    // localStorage save and Display note
-    this.save = () => {
+        // Unique ID
+        this.id = String(Math.floor(Math.random() * 1000)) + String(new Date().getTime()) + String(Math.floor(Math.random() * 500));
+        this.title = title; // Note Title
+        this.content = content; // Note Content
+        this.labels = labels; // Note Labels
+        this.isTrash = false; // Is Note Trashed
+        this.isArchive = false; // Is Note Archived
 
-        // get notes from localStorage
-        const notes = JSON.parse(localStorage.getItem("notes"));
-        if (notes) {
-            // if note already present with same ID
-            let isNotePresent = false;
 
-            // Update note with changes
-            let newNotes = notes.map((note) => {
-                if (note.id == this.id) {
-                    note.title = this.title;
-                    note.content = this.content;
-                    note.labels = this.labels;
-                    note.isArchive = this.isArchive;
-                    note.isTrash = this.isTrash;
-                    isNotePresent = true;
-                }
-                return note;
-            });
+        // localStorage save and Display note
+        this.save = () => {
 
-            // if note not present already
-            if (!isNotePresent) {
+            // get notes from localStorage
+            const notes = JSON.parse(localStorage.getItem("notes"));
+            if (notes) {
+                // if note already present with same ID
+                let isNotePresent = false;
 
-                // Create New note
-                newNotes.unshift({
-                    id: this.id,
-                    title: this.title,
-                    content: this.content,
-                    labels: this.labels,
-                    isArchive: this.isArchive,
-                    isTrash: this.isTrash,
+                // Update note with changes
+                let newNotes = notes.map((note) => {
+                    if (note.id == this.id) {
+                        note.title = this.title;
+                        note.content = this.content;
+                        note.labels = this.labels;
+                        note.isArchive = this.isArchive;
+                        note.isTrash = this.isTrash;
+                        isNotePresent = true;
+                    }
+                    return note;
                 });
-            }
 
-            // Save Added/Updated Notes list to localStorage
-            newNotes = JSON.stringify(newNotes);
-            localStorage.setItem("notes", newNotes);
+                // if note not present already
+                if (!isNotePresent) {
 
-            if (isNotePresent) {
-                // if note already present: update only that note in frontEnd
-                updateNoteData(this.id);
-            } else {
-                // if note added: insert all notes again in frontEnd
-                populateNotes();
-            }
-        } else {
-
-            // if no notes found in localStorage create it
-            localStorage.setItem(
-                "notes",
-                JSON.stringify([
-                    {
+                    // Create New note
+                    newNotes.unshift({
                         id: this.id,
                         title: this.title,
                         content: this.content,
                         labels: this.labels,
                         isArchive: this.isArchive,
                         isTrash: this.isTrash,
-                    },
-                ])
-            );
+                    });
+                }
 
-            // insert all notes in frontEnd
-            populateNotes();
-        }
-    };
-
-    // add to trash/remove completely
-    this.trash = () => {
-
-        // if note already trashed 
-        if (isTrash) {
-
-            // Remove note completely
-            const notes = JSON.parse(localStorage.getItem("notes"));
-            if (notes) {
-                const newNotes = JSON.stringify(
-                    notes.filter((note) => note.id !== this.id)
-                );
+                // Save Added/Updated Notes list to localStorage
+                newNotes = JSON.stringify(newNotes);
                 localStorage.setItem("notes", newNotes);
-                return;
+
+                if (isNotePresent) {
+                    // if note already present: update only that note in frontEnd
+                    updateNoteData(this.id);
+                } else {
+                    // if note added: insert all notes again in frontEnd
+                    populateNotes();
+                }
+            } else {
+
+                // if no notes found in localStorage create it
+                localStorage.setItem(
+                    "notes",
+                    JSON.stringify([
+                        {
+                            id: this.id,
+                            title: this.title,
+                            content: this.content,
+                            labels: this.labels,
+                            isArchive: this.isArchive,
+                            isTrash: this.isTrash,
+                        },
+                    ])
+                );
+
+                // insert all notes in frontEnd
+                populateNotes();
             }
-        }
+        };
 
-        // if note not trashed then do
-        this.isTrash = true;
-        // update localStorage
-        this.save();
-    };
+        // add to trash/remove completely
+        this.trash = () => {
 
-    // Toggel Note Archive
-    this.toggelArchive = () => {
+            // if note already trashed 
+            if (isTrash) {
 
-        if (this.isArchive){
-            // if archived then remove from archive
-            this.isArchive = false;
-        }else{
-            // if not archived then archive it
-            this.isArchive = true;
-        }
-        // update localStorage
-        this.save();
-    };
+                // Remove note completely
+                const notes = JSON.parse(localStorage.getItem("notes"));
+                if (notes) {
+                    const newNotes = JSON.stringify(
+                        notes.filter((note) => note.id !== this.id)
+                    );
+                    localStorage.setItem("notes", newNotes);
+                    return;
+                }
+            }
 
-    // Remove from trash
-    this.untrash = () => {
-        this.isTrash = true;
-        // update localStorage
-        this.save();
-    };
+            // if note not trashed then do
+            this.isTrash = true;
+            // update localStorage
+            this.save();
+        };
+
+        // Toggel Note Archive
+        this.toggelArchive = () => {
+
+            if (this.isArchive) {
+                // if archived then remove from archive
+                this.isArchive = false;
+            } else {
+                // if not archived then archive it
+                this.isArchive = true;
+            }
+            // update localStorage
+            this.save();
+        };
+
+        // Remove from trash
+        this.untrash = () => {
+            this.isTrash = true;
+            // update localStorage
+            this.save();
+        };
+    }
 }
 
 
@@ -151,6 +154,7 @@ function populateNotes() {
                     ${note.labels? `<div class="note-labels">${getLabelsHTML()}</div>`: ""}
                 </div>
             </div>`;
+            
         return html;
     }
 
@@ -193,6 +197,9 @@ function populateNotes() {
 
     // add Note Viewablity into newly added notes within "notesArea"
     makeNotesViewable();
+
+    // make remove label button functionable
+    makeRemoveLabel();
 }
 
 
@@ -205,7 +212,6 @@ function updateNoteData(id) {
     const note = notes.filter((note) => note.id == id)[0];
 
     if (note) {
-
         // Returns Note's Labels HTML section
         function getLabelsHTML() {
             if (note.labels) {
@@ -247,8 +253,12 @@ function updateNoteData(id) {
     
     // add Note Viewablity into newly added notes within "notesArea"
     makeNotesViewable();
+
+    // make remove label button functionable
+    makeRemoveLabel();
 }
 
 
 // Populate Notes into notes area
 populateNotes();
+

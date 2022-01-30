@@ -3,7 +3,8 @@
     padding: 5rem 2.5rem;
 }
 
-/* Notes Container - Individual Notes */
+
+/* Notes-Area Container - Individual Notes/ Note-view Container - Note */
 .note {
     position: relative;
     margin-bottom: 3rem;
@@ -11,84 +12,87 @@
     box-shadow: 2px 2px 8px black;
 }
 
-.note:hover{
+/* Notes-Area Container - Individual Notes */
+.notes-area .note:hover {
     box-shadow: 5px 5px 20px rgb(0, 0, 0);
 }
 
-/* Note - Head (Title, Label, Icon) Container */
+/* Note-Area - Head (Title, Label, Icon) Container/ Note-view Container - Note Head */
 .note .note-head {
     border-bottom: 2px solid #0000004f;
     display: flex;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     padding-top: 1.2rem;
     padding-left: 1rem;
 }
 
-/* Note - Title */
+/* Note-Area - Title/ Note-view Container - Title */
 .note .note-head .title {
     font-family: 'Merriweather', sans-serif;
     letter-spacing: 0.1rem;
     margin: 0 auto;
     line-height: 1.4;
     font-size: 1.1rem;
+    text-align: center;
+    max-height: 150px;
+    overflow-y: scroll;
     color: #001b44;
 }
 
-/* Note - More Icon */
+
+/* Note-Area - More Icon/ Note-view Container - More Icon */
 .note .note-head .more-icon {
     margin-right: 1rem;
     font-size: 1.3rem;
     margin-left: 0.5rem;
 }
 
-/* Note - Text Area */
+
+/* Note-Area - Text Area/ Note-view Container - Note Text Area */
 .note .note-body {
     padding: 1rem 1.2rem;
     padding-bottom: 1rem;
     line-height: 1.3;
 }
 
-.note-body p{
+/* Note-Area - Text/ Note-view Container - Note Text */
+.note .note-body .text {
     color: #383838;
+    max-height: 250px;
+    overflow-y: scroll;
 }
 
-.note-labels{
+/* Note-Area - Labels Container/ Note-view Container - Note Labels Container */
+.note .note-body .note-labels {
     margin-top: 1rem;
     line-height: 1.5;
     display: flex;
     flex-wrap: wrap;
 }
 
-/* Note - Label Container */
+/* Note-Area - Individual Label/ Note-view Container - Note Individual Label */
 .note .note-body .label {
+    position: relative;
     border: 1px solid #19191966;
     padding: 0 0.8rem;
-    background: white;
+    background: #000000cf;
     font-weight: bold;
     border-radius: 0.5rem;
     margin-top: 0.5rem;
-    margin-left: 0.8rem;
+    margin-right: 0.8rem;
     padding-right: 1.5rem;
     font-size: 0.9rem;
-    color: #001d32d4;
+    color: #888888;
     box-shadow: 0px 0px 4px black;
 }
 
-.note .note-body .label:hover{
-    position: relative;
-    background: #000000cf;
-    color: #888888;
-}
-.note .note-body .label:hover p{
+/* Note-Area - Label Text/ Note-view Container - Note Label Text */
+.note .note-body .label p {
     color: rgb(195, 195, 195);
 }
 
-.note .note-body .label .close-button{
-    display: none;
-    transition: var(--transition);
-}
-
-.note .note-body .label:hover .close-button{
+/* Note-Area - Label Remove Button/ Note-view Container - Note Label Remove Button */
+.note .note-body .label .close-button {
     display: block;
     cursor: pointer;
     position: absolute;
@@ -99,8 +103,8 @@
 }
 
 
-
-.note-view-area{
+/* Note-view - Area */
+.note-view-area {
     position: fixed;
     top: 0;
     width: 100%;
@@ -109,16 +113,130 @@
     background: #00000052;
     padding: 1rem 1rem;
     z-index: 2;
-    /* place-content: center; */
     display: flex;
     align-items: center;
 }
 
-.note-view-area .note{
-    background: whitesmoke;
+/* Note-view - Note */
+.note-view-area .note {
+    background: rgb(253, 253, 253);
     padding-bottom: 0.5rem;
     margin: 0 auto;
 }
-.note-view-area .note:hover{
+.note-view-area .note:hover {
     box-shadow: 2px 2px 8px black;
+}
+
+/* Note-view - Note Title */
+.note-view-area .note .title {
+    text-align: center;
+    max-height: 80px;
+    overflow-y: scroll;
+    padding-right: 5px;
+}
+
+/* Note-view - Text */
+.note-view-area .note .note-body .text {
+    max-height: 280px;
+    overflow-y: scroll;
+}
+
+/* Note-view - Note Labels Container */
+.note-view-area .note .note-body .note-labels {
+    max-height: 70px;
+    overflow-y: scroll;
+    padding-bottom: 0.2rem;
+}
+
+/* Note-view - On Editing */
+.note-view-area .note .title:focus-visible,
+.note-view-area .note .text:focus-visible,
+.note-view-area .note .note-labels:focus-visible {
+    outline: none;
+}
+
+/* Note-view - For Scrolling-Bar */
+.note .title::-webkit-scrollbar,
+.note .text::-webkit-scrollbar,
+.note .note-labels::-webkit-scrollbar {
+    width: 0.6rem;
+}
+
+/* Note-view - For Scrolling-Bar-Thumb */
+.note .title::-webkit-scrollbar-thumb,
+.note .text::-webkit-scrollbar-thumb,
+.note .note-labels::-webkit-scrollbar-thumb {
+    background-color: #ff8000;
+    border-left: 5px solid white;
+}
+
+
+/* Prompt - Area */
+.prompt {
+    position: fixed;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: #00000082;
+    top: 0;
+    left: 0;
+}
+
+/* Prompt: Msg Div */
+.prompt .msg-box {
+    border-radius: 20px;
+    background: #f1e8e8;
+    padding: 1rem 2rem;
+    box-shadow: 1px 1px 17px black;
+}
+
+/* Prompt - Msg Text */
+.prompt .msg-box .msg {
+    text-transform: capitalize;
+    margin-bottom: 1rem;
+}
+
+/* Prompt - Msg Tag Name */
+.prompt .msg-box .msg span {
+    color: red;
+    font-family: cursive;
+}
+
+/* Prompt - Buttons Container */
+.prompt .msg-box .msg-button {
+    display: flex;
+    justify-content: center;
+}
+
+/* Prompt - Red Button */
+.prompt .msg-box .msg-button .red {
+    margin-right: 2rem;
+    border: none;
+    font-size: 1rem;
+    font-weight: bolder;
+    color: white;
+    background: #ff0000;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+
+/* Prompt - Green Button */
+.prompt .msg-box .msg-button .green {
+    margin-right: 2rem;
+    border: none;
+    font-size: 1rem;
+    font-weight: bolder;
+    color: white;
+    background: #00b500;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+}
+
+/* Prompt - Buttons on hover */
+.prompt .msg-box .msg-button .red:hover,
+.prompt .msg-box .msg-button .green:hover {
+    cursor: pointer;
 }
