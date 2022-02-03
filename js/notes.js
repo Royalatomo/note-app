@@ -137,7 +137,7 @@ function populateNotes() {
         function getLabelsHTML() {
             let html = "";
             note.labels.forEach((label) => {
-                html += `<span class="label"><p>${label}</p><span class="close-button"><i class="fas fa-times"></i></span></span>`;
+                html += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview  close-button"><i class="fas fa-times"></i></span></span>`;
             });
             return html;
         }
@@ -147,14 +147,14 @@ function populateNotes() {
             <div id="${note.id}" class="note">
                 <div class="note-head">
                     <h4 class="title">${note.title}</h4>
-                    <span class="more-icon"><i class="fas fa-ellipsis-v"></i></span>
+                    <span class="avoid_Noteview more-icon"><span class="avoid_Noteview more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
                 </div>
                 <div class="note-body">
                     <p class="text">${note.content}</p>
-                    ${note.labels? `<div class="note-labels">${getLabelsHTML()}</div>`: ""}
+                    ${note.labels ? `<div class="note-labels">${getLabelsHTML()}</div>` : ""}
                 </div>
             </div>`;
-            
+
         return html;
     }
 
@@ -218,11 +218,12 @@ function updateNoteData(id) {
 
                 // Note's labels holding div
                 const noteLabelContainer = document.createElement("div");
+                noteLabelContainer.classList.add("avoid_Noteview");
                 noteLabelContainer.classList.add("note-labels");
 
                 let html = "";
                 note.labels.forEach((label) => {
-                    html += `<span class="label"><p>${label}</p><span class="close-button"><i class="fas fa-times"></i></span></span>`;
+                    html += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span></span>`;
                 });
 
                 noteLabelContainer.innerHTML = html;
@@ -241,7 +242,7 @@ function updateNoteData(id) {
             // Update Content
             existingNote.querySelector(".text").textContent = note.content;
             // Remove Previous Labels if any
-            if (existingNote.querySelector(".note-labels")){
+            if (existingNote.querySelector(".note-labels")) {
                 existingNote.querySelector(".note-labels").remove()
             }
             // Add Note's Labels if any
@@ -250,7 +251,7 @@ function updateNoteData(id) {
                 .appendChild(getLabelsHTML());
         }
     }
-    
+
     // add Note Viewablity into newly added notes within "notesArea"
     makeNotesViewable();
 
@@ -259,6 +260,103 @@ function updateNoteData(id) {
 }
 
 
+let more_option_prompt = false;
+
+function showMoreOptions(id = '') {
+    document.querySelectorAll('.more-icon-circles').forEach((circle) => {
+
+        circle.addEventListener('click', (e) => {
+            const note = id ? id : e.currentTarget.parentElement.parentElement.parentElement.id;
+            if (!more_option_prompt) {
+                promptMoreOptions(note, id ? true : false);
+
+                document.body.querySelectorAll('.menu').forEach((menu) => {
+                    menu.addEventListener('click', (e) => {
+                        if (e.target.textContent == "add label") {
+                            addLabel();
+                        }
+                    })
+                })
+
+                more_option_prompt = true;
+
+                document.body.addEventListener('click', (e) => {
+                    if (document.querySelector('.menu-container')) {
+                        let status = false;
+
+                        if (e.target.classList.contains("avoid_MoreOptions")) {
+                            status = true;
+                        }
+
+                        if (!status) {
+                            document.querySelector('.menu-container').remove();
+                            more_option_prompt = false;
+                        }
+                    }
+                })
+            } else {
+                const menuContainer = document.querySelector('.menu-container');
+                if (menuContainer) {
+                    menuContainer.remove();
+                }
+                more_option_prompt = false;
+            }
+        })
+    })
+}
+
+// localStorage.setItem('labels', JSON.stringify(['label 1', 'label 2', 'lable 3', 'label 4', 'label 5', 'label 6']))
+
+function addLabel() {
+
+    const labels = JSON.parse(localStorage.getItem('labels'));
+    const menuBox = document.body.querySelector('.menu-box');
+
+    function uncheckBoxes() {
+        const inputs = document.querySelectorAll('.search-result input');
+
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].checked = false;
+        }
+    }
+
+    function returnLabelBoxHTML() {
+
+        function returnLabelHTML() {
+            let html = '<div class="avoid_Noteview avoid_MoreOptions search-result">';
+            labels.forEach((label) => {
+                html += `<div class="avoid_Noteview avoid_MoreOptions label"><input class="avoid_Noteview avoid_MoreOptions" type="checkbox" name="" value=""/><label class="avoid_Noteview avoid_MoreOptions">${label}</label></div>`;
+            })
+            html += '</div>'
+            return html;
+        }
+
+        let html = '<div class="avoid_Noteview avoid_MoreOptions search"><div contenteditable="true" class="avoid_Noteview avoid_MoreOptions search-text">Type Label...</div></div>';
+        html += returnLabelHTML();
+        return html
+    }
+
+    if (menuBox) {
+        menuBox.style.minWidth = "130px";
+        menuBox.style.padding = "0 1rem";
+
+        menuBox.innerHTML = returnLabelBoxHTML();
+
+    }
+
+    const inputs = document.querySelectorAll('.search-result input');
+    inputs.forEach((checkbox) => {
+        checkbox.addEventListener('click', (e) => {
+            const check = e.currentTarget.checked;
+            uncheckBoxes();
+            e.currentTarget.checked = check;
+        })
+    })
+}
+
 // Populate Notes into notes area
 populateNotes();
 
+showMoreOptions();
+
+// Add Label, Change Label, Trash, Complete Remove, Archive, UnArchive 

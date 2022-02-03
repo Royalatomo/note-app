@@ -1,14 +1,8 @@
-// Check if Note's label is clicked
-function checkLabelClicked(list) {
+// Check if Note's label/More-Icon is clicked
+function classesToAvoid_NoteView(list) {
     let status = false;
-
-    // filter these classes
-    const classNames = ["note-labels", "label", "close-button"];
-    for (let i = 0; i < classNames.length; i++) {
-        if (list.contains(classNames[i])) {
-            status = true;
-            break;
-        }
+    if (list.contains("avoid_Noteview")) {
+        status = true;
     }
     return status;
 }
@@ -21,7 +15,7 @@ function returnNoteViewHTML(note) {
     function getLabels() {
         let fullLabelHTML = "";
         labels.forEach((label) => {
-            fullLabelHTML += `<span class="label"><p>${label.textContent.trim()}</p><span class="close-button"><i class="fas fa-times"></i></span></span>`;
+            fullLabelHTML += `<span class="label"><p>${label.textContent.trim()}</p><span class=" close-button"><i class="fas fa-times"></i></span></span>`;
         });
         return fullLabelHTML;
     }
@@ -36,13 +30,14 @@ function returnNoteViewHTML(note) {
     // Main div - Note container
     const section = document.createElement("section");
     section.classList.add("note-view-area");
+    section.classList.add("back-screen");
 
     // Note's div HTML
     const html = `
     <div class="note">
             <div class="note-head">
                 <h4 contenteditable="true" class="title">${title.trim()}</h4>
-                <span class="more-icon"><i class="fas fa-ellipsis-v"></i></span>
+                <span class="more-icon"><span class="avoid_MoreOptions more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
             </div>
             <div class="note-body">
                 <p contenteditable="true" class="text">${content.trim()}</p>
@@ -61,6 +56,7 @@ function returnNoteViewHTML(note) {
 
 // any note is viewing currently
 let noteViewON = false;
+
 
 // On Note Click Open in Viewing mode
 function makeNotesViewable() {
@@ -86,7 +82,7 @@ function makeNotesViewable() {
             notes.forEach((note) => {
                 note.addEventListener("click", (e) => {
                     // Get the exact clicked element
-                    const labelClicked = checkLabelClicked(e.target.parentElement.classList);
+                    const labelClicked = e.target.parentElement?classesToAvoid_NoteView(e.target.parentElement.classList):true;
 
                     // If the clicked element is not label/ If currently some note is being viewed
                     if (!labelClicked && !noteViewON) {
@@ -94,6 +90,8 @@ function makeNotesViewable() {
                         document.body.appendChild(returnNoteViewHTML(e.currentTarget));
                         // make remove label button workable (for this note id)
                         makeRemoveLabel(e.currentTarget.id)
+
+                        showMoreOptions(e.currentTarget.id);
 
                         // Freeze scrolling
                         document.querySelector("body").style.width = "100vw";
@@ -108,6 +106,9 @@ function makeNotesViewable() {
                             if (e.target.classList.contains("note-view-area")) {
                                 // remove note viewer
                                 e.target.remove();
+
+                                // more_option_prompt = false;
+                                showMoreOptions();
 
                                 // Unfreeze scrolling
                                 document.querySelector("body").style.width = "fit-content";
@@ -131,7 +132,7 @@ function makeRemoveLabel(id = "") {
     // Prompt for confiming user deletion
     function promptRemove(tag) {
 
-        if (document.body.querySelector('.prompt')){
+        if (document.body.querySelector('.prompt')) {
             document.body.querySelector('.prompt').remove();
         }
 
@@ -212,6 +213,54 @@ function makeRemoveLabel(id = "") {
             })
         });
     });
+}
+
+
+// Function for displaying more-options
+function promptMoreOptions(noteID, noteView = false) {
+    const menu = [];
+    const note = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteID)[0];
+    let small = false;
+
+    if (note.labels.length > 0) {
+        menu.push('change label');
+        menu.push('add label');
+    } else {
+        menu.push('add label');
+        small = true;
+    }
+
+    if (!note.isArchive) {
+        menu.push('archive')
+        menu.push('delete note')
+    }
+
+    const mainDiv = document.createElement('div');
+    mainDiv.classList.add('avoid_MoreOptions');
+    mainDiv.classList.add('menu-container');
+
+    let html = '<ul class="avoid_Noteview menu-box">';
+    menu.forEach((menu) => {
+        html += `<li ${small ? 'style="min-width: 110px"' : ''} class="avoid_MoreOptions menu">${menu}</li>`;
+    })
+    html += '</ul>'
+
+    mainDiv.innerHTML = html;
+
+    if (!noteView) {
+        let moreIcon = document.getElementById(noteID);
+        if (moreIcon) {
+            moreIcon = moreIcon.querySelector('.more-icon');
+            moreIcon.insertBefore(mainDiv, moreIcon.firstChild);
+        }
+    } else {
+        let moreIcon = document.body.querySelector('.note-view-area .note');
+        if (moreIcon) {
+            moreIcon = moreIcon.querySelector('.more-icon');
+            moreIcon.insertBefore(mainDiv, moreIcon.firstChild);
+        }
+    }
+
 }
 
 
