@@ -355,6 +355,7 @@ function addLabel(noteId) {
 
     function searchLabel(label) {
 
+
         let matchedLabel = [];
         const allLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
 
@@ -366,8 +367,7 @@ function addLabel(noteId) {
             let matchFound = true;
 
             for (let x = 0; x < label.length; x++) {
-
-                if (label[x].toUpperCase() != allLabels[i][x].toUpperCase()) {
+                if (label[x] != allLabels[i][x]) {
                     matchFound = false;
                     break;
                 }
@@ -484,11 +484,13 @@ function addLabel(noteId) {
 
     document.querySelector('.search-text').addEventListener('input', (e) => {
         if (e.currentTarget.textContent !== "") {
+
             let noteId = e.currentTarget;
             for (let i = 0; i < 6; i++) {
                 noteId = noteId.parentElement;
             }
             noteId = noteId.id;
+            console.log(e.currentTarget.textContent.trim());
             const newLabel = searchLabel(e.currentTarget.textContent.trim());
             const labelHTML = returnLabelHTML(newLabel);
             document.querySelector('.search-result').innerHTML = labelHTML;

@@ -1,99 +1,35 @@
-// Remove Labels From Navigation Menu
-function unPopulateLabel() {
-    // Get All Labels
-    const labels = document.querySelectorAll(".label-list");
-    if (labels) {
-        // Remove All Labels
-        labels.forEach((item) => {
-            item.remove();
-        });
-    }
-}
+import { removeLabelsFromNav, addLabelsToNav } from "./helper/navigation/helperFunctions.js";
 
 
-// Add Labels To Navigation Menu
-function populateLabel() {
-    // First remove all labels (if present)
-    unPopulateLabel();
+const navMenuContainer = document.querySelector(".hamburger-menu");
+const navOpenIcon = document.querySelector(".hamburger-icon");
+const navCloseIcon = document.querySelector(".hamburger-menu-close");
+const notesConatiner = document.querySelector(".notes-area");
 
-    // Get All Labels
-    const labels = localStorage.getItem("labels")?JSON.parse(localStorage.getItem("labels")):'';
-
-    // Append all labels to the main navigation
-    if (labels) {
-        labels.forEach((label) => {
-            // create main "li" tag - Main Parent
-            const labelElementList = document.createElement("li");
-            labelElementList.className = "link label-list";
-
-            // create link "a" tag
-            const labelElementLink = document.createElement("a");
-            labelElementLink.setAttribute("href", "#");
-
-            // create tag for icon
-            const labelElementLogo = document.createElement("i");
-            labelElementLogo.className = "icon fas fa-tag";
-
-            // create text with label
-            const labelElementText = document.createTextNode(` ${label}`);
-
-            // Append text and icon in "a" (link tag)
-            labelElementLink.appendChild(labelElementLogo);
-            labelElementLink.appendChild(labelElementText);
-
-            // Append link "a" tag to main "li" tag
-            labelElementList.appendChild(labelElementLink);
-
-            // Append main link tag to navigation menu
-            document
-                .querySelector(".hamburger-menu-links")
-                .insertBefore(
-                    labelElementList,
-                    document.querySelector(".edit-label")
-                );
-        });
-    }
-}
-
-
-// Hamburger Menu
-const hamburgerMenu = document.querySelector(".hamburger-menu");
-// Hamburger Icon
-const hamburgerIcon = document.querySelector(".hamburger-icon");
-// Hamburger Close Button
-const hamburgerCloseIcon = document.querySelector(".hamburger-menu-close");
-
-
-
-// Hamburger Menu starting transition hide
+// while navMenuContainer sliding to left (transition) hide it when sliding complete unhide it 
 window.onload = () => {
-    hamburgerMenu.style.display = "block";
+    navMenuContainer.style.display = "block";
 };
 
-// Hamburger Menu Icon (Clicked) - hide notes-area (to fit menu nicely)
-hamburgerIcon.addEventListener("click", () => {
-    // Notes Holding Div
-    const noteArea = document.querySelector(".notes-area");
+navOpenIcon.addEventListener("click", () => {
+    navMenuContainer.classList.add("show-menu");
 
-    hamburgerMenu.classList.add("show-menu");
-    // Wait for the transition (hamburger menu)
+    // after navMenuContainer sliding transition done then hide the notesContaining div
     setTimeout(() => {
-        if (noteArea) {
-            noteArea.style.display = "none";
+        if (notesConatiner) {
+            notesConatiner.style.display = "none";
         }
     }, 300);
 });
 
-// Hamburger Menu Close Icon (Clicked) - show notes-area
-hamburgerCloseIcon.addEventListener("click", () => {
-    // Notes Holding Div
-    const noteArea = document.querySelector(".notes-area");
+navCloseIcon.addEventListener("click", () => {
+    navMenuContainer.classList.remove("show-menu");
 
-    hamburgerMenu.classList.remove("show-menu");
-    if (noteArea) {
-        noteArea.style.display = "block";
+    // unhide the notesContaining div
+    if (notesConatiner) {
+        notesConatiner.style.display = "block";
     }
 });
 
-
-populateLabel();
+removeLabelsFromNav();
+addLabelsToNav();
