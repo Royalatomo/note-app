@@ -80,6 +80,7 @@
     color: #444444;
     text-transform: capitalize;
     line-height: 1.7;
+
 }
 
 .note .note-head .more-icon .menu-container .menu-box .menu{
@@ -159,7 +160,7 @@
     width: 100%;
     height: 100%;
     left: 0;
-    background: #0000007a;
+    background: #000000bf;
     padding: 1rem 2rem;
     z-index: 2;
     display: flex;
@@ -298,10 +299,28 @@
 }
 
 
+
 .menu-container .search{
     color: #787878;
     margin-bottom: 0.5rem;
     width: 170px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    text-transform: none;
+    letter-spacing: 0.4px;
+    margin: 0 1rem 0.5rem;
+}
+
+.menu-container .search i{
+    width: 10%;
+}
+.menu-container .search .search-text{
+    margin-left: 0.8rem;
+    width: 80%;
+}
+.menu-container .search .search-text:focus{
+    outline: none;   
 }
 
 .menu-container .search-result{
@@ -314,8 +333,43 @@
     flex-direction: column;
     align-items: flex-end;
     padding: 0 0.8rem;
+    margin: 0 1rem 0.5rem;
+    text-transform: none;
+    letter-spacing: 0.4px;
 }
 
 input[type="checkbox"]{
     margin-left: 0.4rem;
+}
+
+
+/*  */
+
+.create-label-container{
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    max-width: inherit;
+    border-top: 2px solid #c1c1c1;
+}
+
+.create-label-container:hover{
+    background-color: rgb(238, 238, 238);
+    cursor: pointer;
+}
+
+.create-label-container .create-label-icon{
+    color: purple;
+    margin-right: 0.5rem;
+    transform: translateY(2px);
+}
+
+.create-label-container .create-label-text{
+    color: black;
+    word-break: break-all;
+}
+.create-label-container .create-label-text .create-label-highlighted{
+    font-weight: bold;
+    letter-spacing: 0.2px;
+    text-transform: none;
 }

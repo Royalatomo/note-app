@@ -1,13 +1,3 @@
-// Check if Note's label/More-Icon is clicked
-function classesToAvoid_NoteView(list) {
-    let status = false;
-    if (list.contains("avoid_Noteview")) {
-        status = true;
-    }
-    return status;
-}
-
-
 // Return's HTML for individual note viewing
 function returnNoteViewHTML(note) {
 
@@ -25,7 +15,8 @@ function returnNoteViewHTML(note) {
     // Get Selected Note Content
     const content = note.querySelector(".text").textContent;
     // Get Selected Note Labels
-    const labels = Array.from(note.querySelectorAll(".label"));
+    const labels = Array.from(note.querySelectorAll(".note-labels .label"));
+
 
     // Main div - Note container
     const section = document.createElement("section");
@@ -67,10 +58,12 @@ function makeNotesViewable() {
     function onEditSaveNote(noteID) {
         const noteView = document.querySelector('.note-view-area');
         if (noteView) {
-            noteView.addEventListener('input', () => {
-                const note = new Note(noteView.querySelector('.title').textContent, noteView.querySelector('.text').textContent, Array.from(noteView.querySelectorAll('.label')).map((label) => { return label.textContent }))
-                note.id = noteID;
-                note.save();
+            noteView.addEventListener('input', (e) => {
+                if (e.target.classList.contains('.title') || e.target.classList.contains('.text')) {
+                    const note = new Note(noteView.querySelector('.title').textContent, noteView.querySelector('.text').textContent, Array.from(noteView.querySelectorAll('.label')).map((label) => { return label.textContent }))
+                    note.id = noteID;
+                    note.save();
+                }
             })
         }
     }
@@ -82,7 +75,7 @@ function makeNotesViewable() {
             notes.forEach((note) => {
                 note.addEventListener("click", (e) => {
                     // Get the exact clicked element
-                    const labelClicked = e.target.parentElement?classesToAvoid_NoteView(e.target.parentElement.classList):true;
+                    const labelClicked = e.target.parentElement ? (e.target.parentElement.classList).contains("avoid_Noteview") : true;
 
                     // If the clicked element is not label/ If currently some note is being viewed
                     if (!labelClicked && !noteViewON) {
@@ -162,10 +155,15 @@ function makeRemoveLabel(id = "") {
     function removeLabelFromNote(currentLabel, note) {
         // remove note from note (frontEnd)
         currentLabel.remove();
-        // create note(same id) without the label tag which have to be deleted 
-        const newNote = new Note(note.querySelector('.title').textContent, note.querySelector('.text').textContent, Array.from(note.querySelectorAll('.label')).map((label) => { return label.textContent }));
+
+        // create note(same id) without the label tag which have to be deleted
+        const newNote = id ?
+            (new Note(document.querySelector('.note-view-area .title').textContent, document.querySelector('.note-view-area .text').textContent, Array.from(document.querySelectorAll('.note-view-area .label')).map((label) => { return label.textContent })))
+            :
+            (new Note(note.querySelector('.title').textContent, note.querySelector('.text').textContent, Array.from(note.querySelectorAll('.label')).map((label) => { return label.textContent })));
+
         // if id already given (noteView - REMOVE) / else (Home - REMOVE)
-        newNote.id = id ? id : note.id;
+        newNote.id = note.id;
         // save changes
         newNote.save();
     }
@@ -183,7 +181,7 @@ function makeRemoveLabel(id = "") {
             // Label for which the button is clicked
             const currentLabel = e.target.parentElement.parentElement;
             // Note in which that label is
-            const note = currentLabel.parentElement.parentElement.parentElement;
+            const note = id ? document.getElementById(id) : currentLabel.parentElement.parentElement.parentElement;
 
             // Get User Confirmation
             promptRemove(currentLabel.textContent);
@@ -199,6 +197,7 @@ function makeRemoveLabel(id = "") {
                 document.body.style.overflow = "visible";
                 // Remove label from note
                 removeLabelFromNote(currentLabel, note);
+
             })
 
             // If user doesn't want to Remove (Confirmation Done)
@@ -237,9 +236,10 @@ function promptMoreOptions(noteID, noteView = false) {
 
     const mainDiv = document.createElement('div');
     mainDiv.classList.add('avoid_MoreOptions');
+    mainDiv.classList.add('avoid_Noteview');
     mainDiv.classList.add('menu-container');
 
-    let html = '<ul class="avoid_Noteview menu-box">';
+    let html = '<ul class="avoid_Noteview avoid_MoreOptions menu-box">';
     menu.forEach((menu) => {
         html += `<li ${small ? 'style="min-width: 110px"' : ''} class="avoid_MoreOptions menu">${menu}</li>`;
     })

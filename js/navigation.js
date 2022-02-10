@@ -17,7 +17,7 @@ function populateLabel() {
     unPopulateLabel();
 
     // Get All Labels
-    const labels = JSON.parse(localStorage.getItem("labels"));
+    const labels = localStorage.getItem("labels")?JSON.parse(localStorage.getItem("labels")):'';
 
     // Append all labels to the main navigation
     if (labels) {
