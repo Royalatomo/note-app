@@ -10,6 +10,7 @@
     margin-bottom: 3rem;
     border-radius: 1rem;
     box-shadow: 2px 2px 8px black;
+    word-break: break-all;
 }
 
 /* Notes-Area Container - Individual Notes */
@@ -154,7 +155,7 @@
 
 
 /* Note-view - Area */
-.back-screen {
+.note-view-area {
     position: fixed;
     top: 0;
     width: 100%;
@@ -172,6 +173,7 @@
     background: rgb(253, 253, 253);
     padding-bottom: 0.5rem;
     margin: 0 auto;
+    word-break: break-all;
 }
 .note-view-area .note:hover {
     box-shadow: 2px 2px 8px black;
@@ -252,7 +254,6 @@
 
 /* Prompt - Msg Text */
 .prompt .msg-box .msg {
-    text-transform: capitalize;
     margin-bottom: 1rem;
 }
 
