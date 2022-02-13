@@ -13,7 +13,7 @@ function returnNoteViewHTML(note) {
     }
 
     const noteTitle = note.querySelector(".title").textContent;
-    const noteContent = note.querySelector(".text").textContent;
+    const noteContent = note.querySelector(".content").textContent;
     const noteLabels = Array.from(note.querySelectorAll(".note-labels .label"));
 
 
@@ -28,7 +28,7 @@ function returnNoteViewHTML(note) {
                 <span class="more-icon"><span class="avoid_MoreOptions more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
             </div>
             <div class="note-body">
-                <p contenteditable="true" class="text">${noteContent.trim()}</p>
+                <p contenteditable="true" class="content">${noteContent.trim()}</p>
                 ${noteLabels ? `<div class="note-labels">${getCombinedLabelsHTML(noteLabels)}</div>` : ""}
             </div>
         </div>
@@ -54,10 +54,10 @@ function makeNotesViewable() {
             const viewingNoteInputField = e.target;
             const viewingNoteInputClass = viewingNoteInputField.classList;
 
-            if (!viewingNoteInputClass.contains('title') && !viewingNoteInputClass.contains('text')) { return }
+            if (!viewingNoteInputClass.contains('title') && !viewingNoteInputClass.contains('content')) { return }
 
             const noteTitle = viewingNoteContainer.querySelector('.title').textContent;
-            const noteContent = viewingNoteContainer.querySelector('.text').textContent;
+            const noteContent = viewingNoteContainer.querySelector('.content').textContent;
             const noteLabels = Array.from(viewingNoteContainer.querySelectorAll('.label'));
 
             const note = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.textContent }));
@@ -116,7 +116,7 @@ function makeNotesViewable() {
 
 
 // Function for deleting labels from the note
-function makeRemoveLabel(id = "") {
+function makeRemoveLabel(noteId = "") {
 
     // Prompt for confiming user deletion
     function promptConfirmationBox(tag) {
@@ -152,28 +152,28 @@ function makeRemoveLabel(id = "") {
         currentLabel.remove();
 
         let newNote = "";
-        if (id) {
+        if (noteId) {
             // id given means the note is clicked for viewing
             const noteTitle = document.querySelector('.note-view-area .title').textContent;
-            const noteContent = document.querySelector('.note-view-area .text').textContent;
+            const noteContent = document.querySelector('.note-view-area .content').textContent;
             const noteLabels = Array.from(document.querySelectorAll('.note-view-area .note-labels .label'));
             newNote = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.textContent }));
 
         } else {
             // id means the note is not opened seprately
             const noteTitle = note.querySelector('.title').textContent;
-            const noteContent = note.querySelector('.text').textContent;
+            const noteContent = note.querySelector('.content').textContent;
             const noteLabels = Array.from(note.querySelectorAll('.note-labels .label'));
             currentLabel.remove();
             newNote = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.textContent }));
         }
 
-        newNote.id = id ? id : note.id;
+        newNote.id = noteId ? noteId : note.id;
         newNote.save();
 
         // when note is not in view mode and label is removed it is refressed and
         // a new instance is made so make that instance's button functionable 
-        if (!id) { makeRemoveLabel() }
+        if (!noteId) { makeRemoveLabel() }
     }
 
 
@@ -188,7 +188,7 @@ function makeRemoveLabel(id = "") {
             const currentLabelRmButton = e.target.parentElement.parentElement;
 
             // Note in which that label is (id = noteview)
-            const clickedLabelNote = id ? document.getElementById(id) : currentLabelRmButton.parentElement.parentElement.parentElement;
+            const clickedLabelNote = noteId ? document.getElementById(noteId) : currentLabelRmButton.parentElement.parentElement.parentElement;
             // Get User Confirmation
             promptConfirmationBox(currentLabelRmButton.textContent);
 

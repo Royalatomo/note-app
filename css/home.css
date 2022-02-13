@@ -107,7 +107,8 @@
 }
 
 /* Note-Area - Text/ Note-view Container - Note Text */
-.note .note-body .text {
+.note .note-body .content {
+    word-break: break-word;
     color: #383838;
     max-height: 250px;
     overflow-y: scroll;
@@ -192,7 +193,7 @@
 } */
 
 /* Note-view - Text */
-.note-view-area .note .note-body .text {
+.note-view-area .note .note-body .content {
     max-height: 280px;
     overflow-y: scroll;
 }
@@ -206,7 +207,7 @@
 
 /* Note-view - On Editing */
 .note-view-area .note .title:focus-visible,
-.note-view-area .note .text:focus-visible,
+.note-view-area .note .content:focus-visible,
 .note-view-area .note .note-labels:focus-visible,
 .menu-container .search-result:focus-visible {
     outline: none;
@@ -214,7 +215,7 @@
 
 /* Note-view - For Scrolling-Bar */
 .note .title::-webkit-scrollbar,
-.note .text::-webkit-scrollbar,
+.note .content::-webkit-scrollbar,
 .note .note-labels::-webkit-scrollbar,
 .menu-container .search-result::-webkit-scrollbar {
     width: 0.6rem;
@@ -222,7 +223,7 @@
 
 /* Note-view - For Scrolling-Bar-Thumb */
 .note .title::-webkit-scrollbar-thumb,
-.note .text::-webkit-scrollbar-thumb,
+.note .content::-webkit-scrollbar-thumb,
 .note .note-labels::-webkit-scrollbar-thumb,
 .menu-container .search-result::-webkit-scrollbar-thumb {
     background-color: #ff8000;

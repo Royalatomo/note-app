@@ -1,146 +1,176 @@
 import { Note } from "../classes.js";
 import { makeNotesViewable, makeRemoveLabel } from "../home/helperFunctions.js";
 
-
-
-// Update individual note on frontEnd
-function updateNoteData(id) {
-
-    // Get updated note list
-    const notes = JSON.parse(localStorage.getItem("notes"));
-    // Get note which will be updated
-    const note = notes.filter((note) => note.id == id)[0];
-
-    if (note) {
-        // Returns Note's Labels HTML section
-        function getLabelsHTML() {
-            if (note.labels) {
-
-                // Note's labels holding div
-                const noteLabelContainer = document.createElement("div");
-                noteLabelContainer.classList.add("avoid_Noteview");
-                noteLabelContainer.classList.add("note-labels");
-
-                let html = "";
-                note.labels.forEach((label) => {
-                    html += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span></span>`;
-                });
-
-                noteLabelContainer.innerHTML = html;
-                return noteLabelContainer;
-            }
-
-            // if no labels are there
-            return "";
-        }
-
-        // Get old note from DOM
-        const existingNote = document.getElementById(note.id);
-        if (existingNote) {
-            // Update Title
-            existingNote.querySelector(".title").textContent = note.title;
-            // Update Content
-            existingNote.querySelector(".text").textContent = note.content;
-            // Remove Previous Labels if any
-            if (existingNote.querySelector(".note-labels")) {
-                existingNote.querySelector(".note-labels").remove()
-            }
-            // Add Note's Labels if any
-            existingNote
-                .querySelector(".note-body")
-                .appendChild(getLabelsHTML());
-        }
-    }
-
-
-}
-
-
-// Populate Notes into notes area
+// display all notes in frontend
 function populateNotes() {
 
-    // Return single note HTML
-    function returnNoteHTML(note) {
+    function returnSingleNoteHTML(note) {
 
-        // Return HTML for Note Labels
-        function getLabelsHTML() {
-            let html = "";
+        function getCombinedLabelsHTML() {
+            let allLabelsHTML = "";
             note.labels.forEach((label) => {
-                html += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview  close-button"><i class="fas fa-times"></i></span></span>`;
+                allLabelsHTML += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview  close-button"><i class="fas fa-times"></i></span></span>`;
             });
-            return html;
+            return allLabelsHTML;
         }
 
-        // Main Returning HTML
-        let html = `
+        let noteHTML = `
             <div id="${note.id}" class="note">
                 <div class="note-head">
                     <h4 class="title">${note.title}</h4>
                     <span class="avoid_Noteview more-icon"><span class="avoid_Noteview more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
                 </div>
                 <div class="note-body">
-                    <p class="text">${note.content}</p>
-                    ${note.labels ? `<div class="note-labels">${getLabelsHTML()}</div>` : ""}
+                    <p class="content">${note.content}</p>
+                    ${note.labels ? `<div class="note-labels">${getCombinedLabelsHTML()}</div>` : ""}
                 </div>
             </div>`;
 
-        return html;
+        return noteHTML;
     }
 
 
-    // Remove Notes if present in "noteArea"
-    const noteArea = document.querySelectorAll(".note-area");
-    if (noteArea) {
-        noteArea.innerHTML = "";
+    const notesContainingDiv = document.querySelectorAll(".note-area");
+
+    // is notes already present in it remove all
+    if (notesContainingDiv) {
+        notesContainingDiv.innerHTML = "";
     }
 
-    // Get all notes from localStorage
-    const notes = localStorage.getItem("notes") ? JSON.parse(localStorage.getItem("notes")) : '';
-    if (notes) {
+    const allSavedNotes = localStorage.getItem("notes") ? JSON.parse(localStorage.getItem("notes")) : '';
+    if (!allSavedNotes) { return }
 
-        // Contains - All Notes HTML (Combined)
-        let allNotesHTML = "";
+    let allCombinedNotesHTML = "";
+    allSavedNotes.forEach((note) => {
+        allCombinedNotesHTML += returnSingleNoteHTML(note);
+    });
 
-        // Get All notes HTML
-        notes.forEach((note) => {
-            allNotesHTML += returnNoteHTML(note);
+    // if notes containing div is not present - create it
+    if (!document.querySelector(".notes-area")) {
+        const noteAreaSection = document.createElement("section");
+        noteAreaSection.classList.add("notes-area");
+        noteAreaSection.innerHTML = allCombinedNotesHTML;
+        document.body.appendChild(noteAreaSection);
+    }
+    else {
+        document.querySelector(".notes-area").innerHTML = allCombinedNotesHTML;
+    }
+
+    // make note's button functionable
+    makeNotesViewable();
+    makeRemoveLabel();
+}
+
+
+// Update individual note on frontEnd
+function updateNoteData(noteId) {
+
+    const allSavedNotes = JSON.parse(localStorage.getItem("notes"));
+    const updatingNote = allSavedNotes.filter((note) => note.id == noteId)[0];
+
+    if (!updatingNote) { return }
+
+    // Get old note from DOM
+    const existingNote = document.getElementById(updatingNote.id);
+    if (!existingNote) { return }
+
+    // Returns Note's Labels HTML section
+    function getNoteLabelsHTML() {
+        if (!updatingNote.labels) { return };
+
+        // Note's labels holding div
+        const noteLabelContainer = document.createElement("div");
+        noteLabelContainer.classList.add("avoid_Noteview");
+        noteLabelContainer.classList.add("note-labels");
+
+        let allCombinedLabelsHTML = "";
+        updatingNote.labels.forEach((label) => {
+            allCombinedLabelsHTML += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span></span>`;
         });
 
-        // If notesArea not present (First Note)
-        if (!document.querySelector(".notes-area")) {
-
-            // Create "noteArea" element
-            const noteAreaSection = document.createElement("section");
-            noteAreaSection.classList.add("notes-area");
-            // Add Notes HTML into "noteArea" element
-            noteAreaSection.innerHTML = allNotesHTML;
-            // Add "noteArea" element into body
-            document.body.appendChild(noteAreaSection);
-        }
-        // If notesArea already present
-        else {
-            // add all notes to "notesArea" element
-            document.querySelector(".notes-area").innerHTML = allNotesHTML;
-        }
+        noteLabelContainer.innerHTML = allCombinedLabelsHTML;
+        return noteLabelContainer;
     }
 
-    // add Note Viewablity into newly added notes within "notesArea"
-    makeNotesViewable();
+    // Update Title
+    existingNote.querySelector(".title").textContent = updatingNote.title;
+    // Update Content
+    existingNote.querySelector(".content").textContent = updatingNote.content;
 
-    // make remove label button functionable
-    makeRemoveLabel();
+    // Update Labels if any
+    if (existingNote.querySelector(".note-labels")) {
+        existingNote.querySelector(".note-labels").remove()
+
+        const freshLabels = getNoteLabelsHTML();
+        if (freshLabels) {
+            existingNote.querySelector(".note-body").appendChild(freshLabels);
+        }
+    }
+}
+
+
+// Function for displaying more-options
+function promptMoreOptions(noteId, noteView = false) {
+    const moreOptionsMenu = [];
+    const clickedNoteForMenu = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteId)[0];
+    const noteLabels = clickedNoteForMenu.labels;
+    let isLabelPresent = false;
+
+    if (noteLabels.length > 0) {
+        // if label present give "change label" option also
+        moreOptionsMenu.push('change label');
+        moreOptionsMenu.push('add label');
+    } else {
+        moreOptionsMenu.push('add label');
+        isLabelPresent = true;
+    }
+
+    if (!clickedNoteForMenu.isArchive) {
+        moreOptionsMenu.push('archive')
+        moreOptionsMenu.push('delete note')
+    }
+
+    // menu holding div - element
+    const mainDiv = document.createElement('div');
+    mainDiv.classList.add('avoid_MoreOptions');
+    mainDiv.classList.add('avoid_Noteview');
+    mainDiv.classList.add('menu-container');
+
+    // menu holding div - html
+    let mainDivHTML = '<ul class="avoid_Noteview avoid_MoreOptions menu-box">';
+    moreOptionsMenu.forEach((menu) => {
+        mainDivHTML += `<li ${isLabelPresent ? 'style="min-width: 110px"' : ''} class="avoid_MoreOptions menu">${menu}</li>`;
+    })
+    mainDivHTML += '</ul>'
+    mainDiv.innerHTML = mainDivHTML;
+
+
+    // if more-options menu is not clicked in noteview
+    if (!noteView) {
+        const note = document.getElementById(noteId)
+        if (note) {
+            const moreIcon = note.querySelector('.more-icon');
+            moreIcon.insertBefore(mainDiv, moreIcon.firstChild);
+        }
+    } else {
+        const noteView = document.body.querySelector('.note-view-area .note');
+        if (noteView) {
+            const moreIcon = noteView.querySelector('.more-icon');
+            moreIcon.insertBefore(mainDiv, moreIcon.firstChild);
+        }
+    }
 }
 
 
 let more_option_prompt = false;
 
-function showMoreOptions(id = '') {
+function showMoreOptions(noteId = '') {
     document.querySelectorAll('.more-icon-circles').forEach((circle) => {
 
         circle.addEventListener('click', (e) => {
-            const note = id ? id : e.currentTarget.parentElement.parentElement.parentElement.id;
+            const note = noteId ? noteId : e.currentTarget.parentElement.parentElement.parentElement.id;
             if (!more_option_prompt) {
-                promptMoreOptions(note, id ? true : false);
+                promptMoreOptions(note, noteId ? true : false);
 
                 document.body.querySelectorAll('.menu').forEach((menu) => {
                     menu.addEventListener('click', (e) => {
@@ -379,53 +409,4 @@ function addLabel(noteId) {
 
 
 
-// Function for displaying more-options
-function promptMoreOptions(noteID, noteView = false) {
-    const menu = [];
-    const note = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteID)[0];
-    let small = false;
-
-    if (note.labels.length > 0) {
-        menu.push('change label');
-        menu.push('add label');
-    } else {
-        menu.push('add label');
-        small = true;
-    }
-
-    if (!note.isArchive) {
-        menu.push('archive')
-        menu.push('delete note')
-    }
-
-    const mainDiv = document.createElement('div');
-    mainDiv.classList.add('avoid_MoreOptions');
-    mainDiv.classList.add('avoid_Noteview');
-    mainDiv.classList.add('menu-container');
-
-    let html = '<ul class="avoid_Noteview avoid_MoreOptions menu-box">';
-    menu.forEach((menu) => {
-        html += `<li ${small ? 'style="min-width: 110px"' : ''} class="avoid_MoreOptions menu">${menu}</li>`;
-    })
-    html += '</ul>'
-
-    mainDiv.innerHTML = html;
-
-    if (!noteView) {
-        let moreIcon = document.getElementById(noteID);
-        if (moreIcon) {
-            moreIcon = moreIcon.querySelector('.more-icon');
-            moreIcon.insertBefore(mainDiv, moreIcon.firstChild);
-        }
-    } else {
-        let moreIcon = document.body.querySelector('.note-view-area .note');
-        if (moreIcon) {
-            moreIcon = moreIcon.querySelector('.more-icon');
-            moreIcon.insertBefore(mainDiv, moreIcon.firstChild);
-        }
-    }
-
-}
-
-
-export { Note, updateNoteData, populateNotes, showMoreOptions, addLabel };
+export { updateNoteData, populateNotes, showMoreOptions, addLabel };
