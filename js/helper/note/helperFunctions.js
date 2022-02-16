@@ -1,5 +1,32 @@
-import { Note } from "../classes.js";
 import { makeNotesViewable, makeRemoveLabel } from "../home/helperFunctions.js";
+
+// NewLine Bug Fix: Takes text for title/content and converts them to html tags (span, br) 
+function convertTextToHtml(text) {
+
+    // if no text saved
+    if (!text) { return '' }
+
+    const textWithNewLine = text.split('\n');
+
+    const htmlHolder = document.createElement('div');
+    htmlHolder.setAttribute('class', 'removeMe')
+
+    // save every text with span tag, and add newline
+    for (let index = 0; index < textWithNewLine.length; index++) {
+
+        const textElementSpan = document.createElement('span');
+        textElementSpan.innerText = textWithNewLine[index];
+        htmlHolder.appendChild(textElementSpan);
+
+        const lastIndex = textWithNewLine.length - 1;
+        if (index !== lastIndex) {
+            htmlHolder.appendChild(document.createElement('br'));
+        }
+    }
+
+    return htmlHolder.innerHTML;
+}
+
 
 // display all notes in frontend
 function populateNotes() {
@@ -9,24 +36,39 @@ function populateNotes() {
         function getCombinedLabelsHTML() {
             let allLabelsHTML = "";
             note.labels.forEach((label) => {
-                allLabelsHTML += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview  close-button"><i class="fas fa-times"></i></span></span>`;
+                const element = document.createElement('span');
+                element.setAttribute('class', 'avoid_Noteview label');
+                element.innerHTML = `<p></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
+                element.querySelector('p').innerText = label;
+                allLabelsHTML += element.outerHTML;
             });
+
             return allLabelsHTML;
         }
 
-        let noteHTML = `
-            <div id="${note.id}" class="note">
+        const noteTitle = note.title;
+        const noteContent = note.content;
+
+        const noteElement = document.createElement('div');
+        noteElement.setAttribute('class', 'removeMe')
+        noteElement.setAttribute('id', note.id);
+        noteElement.setAttribute('class', "note");
+
+        noteElement.innerHTML = `
                 <div class="note-head">
-                    <h4 class="title">${note.title}</h4>
+                    <h4 class="title"></h4>
                     <span class="avoid_Noteview more-icon"><span class="avoid_Noteview more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
                 </div>
                 <div class="note-body">
-                    <p class="content">${note.content}</p>
+                    <p class="content"></p>
                     ${note.labels ? `<div class="note-labels">${getCombinedLabelsHTML()}</div>` : ""}
-                </div>
-            </div>`;
+                </div>`;
 
-        return noteHTML;
+        // Convert Text to Html Tags
+        noteElement.querySelector('.content').innerHTML = convertTextToHtml(noteContent);
+        noteElement.querySelector('.title').innerHTML = convertTextToHtml(noteTitle);
+
+        return noteElement;
     }
 
 
@@ -42,7 +84,7 @@ function populateNotes() {
 
     let allCombinedNotesHTML = "";
     allSavedNotes.forEach((note) => {
-        allCombinedNotesHTML += returnSingleNoteHTML(note);
+        allCombinedNotesHTML += returnSingleNoteHTML(note).outerHTML;
     });
 
     // if notes containing div is not present - create it
@@ -85,17 +127,20 @@ function updateNoteData(noteId) {
 
         let allCombinedLabelsHTML = "";
         updatingNote.labels.forEach((label) => {
-            allCombinedLabelsHTML += `<span class="avoid_Noteview label"><p>${label}</p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span></span>`;
+            const element = document.createElement('span');
+            element.setAttribute('class', 'avoid_Noteview label');
+            element.innerHTML = `<p></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
+            element.querySelector('p').innerText = label;
+            allCombinedLabelsHTML += element.outerHTML;
         });
 
         noteLabelContainer.innerHTML = allCombinedLabelsHTML;
         return noteLabelContainer;
     }
 
-    // Update Title
-    existingNote.querySelector(".title").textContent = updatingNote.title;
-    // Update Content
-    existingNote.querySelector(".content").textContent = updatingNote.content;
+    // Update Title and Content, convert Text to Html Tags
+    existingNote.querySelector(".title").innerHTML = convertTextToHtml(updatingNote.title);
+    existingNote.querySelector(".content").innerHTML = convertTextToHtml(updatingNote.content);
 
     // Update Labels if any
     if (existingNote.querySelector(".note-labels")) {
@@ -162,79 +207,69 @@ function promptMoreOptions(noteId, noteView = false) {
 }
 
 
-let more_option_prompt = false;
+// check if more option menu is showing
+let moreOptionPromted = false;
 
 function showMoreOptions(noteId = '') {
-    document.querySelectorAll('.more-icon-circles').forEach((circle) => {
+    const moreOptionCircleMenu = document.querySelectorAll('.more-icon-circles');
 
+    moreOptionCircleMenu.forEach((circle) => {
         circle.addEventListener('click', (e) => {
             const note = noteId ? noteId : e.currentTarget.parentElement.parentElement.parentElement.id;
-            if (!more_option_prompt) {
-                promptMoreOptions(note, noteId ? true : false);
-
-                document.body.querySelectorAll('.menu').forEach((menu) => {
-                    menu.addEventListener('click', (e) => {
-                        if (e.target.textContent == "add label") {
-                            addLabel(note);
-                        }
-                    })
-                })
-
-                more_option_prompt = true;
-
-                document.body.addEventListener('click', (e) => {
-                    if (document.querySelector('.menu-container')) {
-                        let status = false;
-
-                        if (e.target.classList.contains("avoid_MoreOptions")) {
-                            status = true;
-                        }
-
-                        if (!status) {
-                            document.querySelector('.menu-container').remove();
-                            more_option_prompt = false;
-                        }
-                    }
-                })
-            } else {
+            if (moreOptionPromted) {
                 const menuContainer = document.querySelector('.menu-container');
                 if (menuContainer) {
                     menuContainer.remove();
                 }
-                more_option_prompt = false;
+                moreOptionPromted = false;
+                return;
             }
+
+            // Show more-option menu
+            promptMoreOptions(note, noteId ? true : false);
+
+            const menuBoxOption = document.body.querySelectorAll('.menu');
+            menuBoxOption.forEach((option) => {
+                option.addEventListener('click', (e) => {
+                    // if user clicked "add label" option
+                    if (e.target.textContent == "add label") {
+                        addLabel(note);
+                    }
+                })
+            })
+
+            moreOptionPromted = true;
+
+            document.body.addEventListener('click', (e) => {
+                if (!document.querySelector('.menu-container')) { return }
+
+                let clickedOnMenuBox = false;
+                if (e.target.classList.contains("avoid_MoreOptions")) {
+                    clickedOnMenuBox = true;
+                }
+
+                // if user clicked outside menubox remove the more-option prompt
+                if (!clickedOnMenuBox) {
+                    document.querySelector('.menu-container').remove();
+                    moreOptionPromted = false;
+                }
+            })
         })
     })
 }
 
+import { returnLabelHTML, returnFullAddLabelHTML, showAlreadyAddedLabel, searchLabel, createLabel } from "./addFunctionHelper.js";
 
 function addLabel(noteId) {
 
     let labels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
     const menuBox = document.body.querySelector('.menu-box');
 
-    function returnLabelHTML(labels) {
-        let html = '';
-        labels.forEach((label) => {
-            html += `<div class="avoid_Noteview avoid_MoreOptions label"><input class="avoid_Noteview avoid_MoreOptions" type="checkbox" name="" value=""/><label class="avoid_Noteview avoid_MoreOptions">${label}</label></div>`;
-        })
-        return html;
-    }
-
-    function returnFullAddLabelHTML() {
-        let html = '<div class="avoid_Noteview avoid_MoreOptions search"><i class="fas fa-search avoid_MoreOptions"></i><div contenteditable="true" class="avoid_Noteview avoid_MoreOptions search-text">Type Label...</div></div><div class="avoid_Noteview avoid_MoreOptions search-result">';
-        html += returnLabelHTML(labels);
-        html += '</div>';
-        return html
-    }
-
-
     if (menuBox) {
         menuBox.style.minWidth = "130px";
-        menuBox.innerHTML = returnFullAddLabelHTML();
+        menuBox.innerHTML = returnFullAddLabelHTML(labels);
         showAlreadyAddedLabel(noteId);
     }
-
 
     document.querySelector('.menu-container .search .search-text').addEventListener('click', (e) => {
         const searchBar = e.currentTarget;
@@ -254,136 +289,6 @@ function addLabel(noteId) {
         }
     })
 
-    function searchLabel(label) {
-
-
-        let matchedLabel = [];
-        const allLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
-
-        if (!allLabels) {
-            return [];
-        }
-
-        for (let i = 0; i < allLabels.length; i++) {
-            let matchFound = true;
-
-            for (let x = 0; x < label.length; x++) {
-                if (label[x] != allLabels[i][x]) {
-                    matchFound = false;
-                    break;
-                }
-            }
-
-            if (matchFound) {
-                matchedLabel.push(allLabels[i])
-                matchFound = false;
-            }
-        }
-
-        return matchedLabel;
-    }
-
-    function showAlreadyAddedLabel() {
-        const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
-        const noteLabels = note.labels;
-
-        const searchResultLabels = document.querySelectorAll('.menu-box .label')
-        searchResultLabels.forEach((label) => {
-            const labelText = label.querySelector('label').textContent;
-            const findIndex = noteLabels.findIndex((element) => element == labelText);
-            if (!(findIndex === -1)) {
-                label.querySelector('input').checked = true;
-            }
-
-            label.querySelector('input').addEventListener('change', (e) => {
-
-                let note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
-                let newNote = new Note(note.title, note.content, note.labels);
-
-                newNote.id = noteId;
-
-                const checkboxLabel = e.currentTarget.parentElement.lastElementChild.textContent;
-
-                if (e.currentTarget.checked) {
-                    newNote.labels.push(checkboxLabel);
-
-                } else {
-                    newNote.labels = newNote.labels.filter((label) => label !== checkboxLabel);
-                }
-
-                newNote.save();
-                makeRemoveLabel();
-
-                if (document.querySelector('.note-view-area')) {
-                    document.querySelector('.note-view-area .note-labels').innerHTML = document.getElementById(noteId).querySelector('.note-labels').innerHTML;
-                    makeRemoveLabel(noteId);
-                }
-            })
-        })
-    }
-
-    function createLabel(label) {
-
-        function crateLabelHTML() {
-
-            const html = `<i class="fas fa-plus-circle avoid_Noteview avoid_MoreOptions create-label-icon" aria-hidden="true"></i><p class="avoid_Noteview avoid_MoreOptions create-label-text">Create - <span class="avoid_Noteview avoid_MoreOptions create-label-highlighted">${label}</span></p>`;
-
-            if (document.querySelector('.menu-container .create-label-container')) {
-                document.querySelector('.menu-container .create-label-container').innerHTML = html;
-            } else {
-                const createLabel = document.createElement('div');
-                createLabel.className = "avoid_Noteview avoid_MoreOptions create-label-container";
-                createLabel.innerHTML = html;
-                document.querySelector('.menu-container').appendChild(createLabel);
-                document.querySelector('.create-label-container').addEventListener('click', () => {
-                    const label = document.querySelector('.create-label-highlighted').textContent;
-                    const labelIndex = labels.findIndex((element) => element == label);
-                    if (labelIndex == -1) {
-                        const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
-                        const newNote = new Note(note.title, note.content, [...note.labels, label]);
-                        newNote.id = note.id;
-                        const newLabels = [...localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [], label]
-                        localStorage.setItem('labels', JSON.stringify(newLabels));
-                        newNote.save();
-                        addLabel(noteId);
-                    }
-                })
-            }
-        }
-
-        if (!label) {
-            if (document.body.querySelector('.create-label-container')) {
-                document.body.querySelector('.create-label-container').remove();
-                document.body.querySelector('.menu-container').style.paddingBottom = '1rem';
-            }
-            return;
-        }
-
-        let labelFound = false;
-
-        for (let i = 0; i < labels.length; i++) {
-            if (label == labels[i]) {
-                labelFound = true;
-                break;
-            }
-        }
-
-
-        if (!labelFound) {
-
-            document.body.querySelector('.menu-container').style.paddingBottom = 0;
-            crateLabelHTML();
-
-        } else {
-            document.body.querySelector('.menu-container').style.paddingBottom = '1rem';
-            if (document.body.querySelector('.create-label-container')) {
-                document.body.querySelector('.create-label-container').remove();
-            }
-        }
-
-        // makeAddFunctionable();
-    }
-
     document.querySelector('.search-text').addEventListener('input', (e) => {
         if (e.currentTarget.textContent !== "") {
 
@@ -396,15 +301,13 @@ function addLabel(noteId) {
             const labelHTML = returnLabelHTML(newLabel);
             document.querySelector('.search-result').innerHTML = labelHTML;
             showAlreadyAddedLabel(noteId);
-            createLabel(e.currentTarget.textContent.trim());
+            createLabel(noteId, e.currentTarget.textContent.trim());
         } else {
             const labelHTML = returnLabelHTML(labels);
             document.querySelector('.search-result').innerHTML = labelHTML;
-            createLabel(e.currentTarget.textContent);
+            showAlreadyAddedLabel(noteId);
         }
     });
-
-
 }
 
 

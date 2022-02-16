@@ -1,6 +1,8 @@
 /* Notes - Container */
 .notes-area {
     padding: 5rem 2.5rem;
+    position: absolute;
+    width: 100%;
 }
 
 
@@ -51,16 +53,18 @@
     margin-left: 0.5rem;
     position: relative;
 }
-.note .note-head .more-icon .more-icon-circles{
+
+.note .note-head .more-icon .more-icon-circles {
     padding: 0.1rem 0.2rem;
     display: flex;
     flex-direction: column;
 }
-.note .note-head .more-icon i{
+
+.note .note-head .more-icon i {
     margin-bottom: 0.2rem;
 }
 
-.note .note-head .more-icon .menu-container{
+.note .note-head .more-icon .menu-container {
     position: absolute;
     font-size: 1rem;
     width: fit-content;
@@ -74,7 +78,7 @@
     z-index: 1;
 }
 
-.note .note-head .more-icon .menu-container .menu-box{
+.note .note-head .more-icon .menu-container .menu-box {
     display: flex;
     flex-direction: column;
     list-style: none;
@@ -84,7 +88,7 @@
 
 }
 
-.note .note-head .more-icon .menu-container .menu-box .menu{
+.note .note-head .more-icon .menu-container .menu-box .menu {
     display: inline-block;
     min-width: 130px;
     list-style: none;
@@ -94,7 +98,7 @@
     padding: 0 15px;
 }
 
-.note .note-head .more-icon .menu-container .menu-box .menu:hover{
+.note .note-head .more-icon .menu-container .menu-box .menu:hover {
     background-color: #80808040;
     cursor: pointer;
 }
@@ -176,6 +180,7 @@
     margin: 0 auto;
     word-break: break-all;
 }
+
 .note-view-area .note:hover {
     box-shadow: 2px 2px 8px black;
 }
@@ -302,7 +307,7 @@
 
 
 
-.menu-container .search{
+.menu-container .search {
     color: #787878;
     margin-bottom: 0.5rem;
     width: 170px;
@@ -314,18 +319,20 @@
     margin: 0 1rem 0.5rem;
 }
 
-.menu-container .search i{
+.menu-container .search i {
     width: 10%;
 }
-.menu-container .search .search-text{
+
+.menu-container .search .search-text {
     margin-left: 0.8rem;
     width: 80%;
 }
-.menu-container .search .search-text:focus{
-    outline: none;   
+
+.menu-container .search .search-text:focus {
+    outline: none;
 }
 
-.menu-container .search-result{
+.menu-container .search-result {
     color: black;
     list-style: none;
     max-height: 80px;
@@ -340,14 +347,14 @@
     letter-spacing: 0.4px;
 }
 
-input[type="checkbox"]{
+input[type="checkbox"] {
     margin-left: 0.4rem;
 }
 
 
 /*  */
 
-.create-label-container{
+.create-label-container {
     display: flex;
     align-items: center;
     padding: 0.5rem 1rem;
@@ -355,22 +362,23 @@ input[type="checkbox"]{
     border-top: 2px solid #c1c1c1;
 }
 
-.create-label-container:hover{
+.create-label-container:hover {
     background-color: rgb(238, 238, 238);
     cursor: pointer;
 }
 
-.create-label-container .create-label-icon{
+.create-label-container .create-label-icon {
     color: purple;
     margin-right: 0.5rem;
     transform: translateY(2px);
 }
 
-.create-label-container .create-label-text{
+.create-label-container .create-label-text {
     color: black;
     word-break: break-all;
 }
-.create-label-container .create-label-text .create-label-highlighted{
+
+.create-label-container .create-label-text .create-label-highlighted {
     font-weight: bold;
     letter-spacing: 0.2px;
     text-transform: none;

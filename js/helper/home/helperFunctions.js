@@ -1,19 +1,83 @@
 import { Note } from "../classes.js";
 import { showMoreOptions } from "../note/helperFunctions.js";
 
+// NewLine Bug Fix: Takes innerHtml(span, br) and converts it to text with newline (\n)
+function convertNoteContentHtmlToText(html) {
+
+    function refactorGivenHtml() {
+        let refactoredHtml = html;
+        // replace these keywords from NoteContent innnerHTML
+        const replaceKeywords = { '<div><span>': '<span>', '</span></div>': '</span>', '<div>': '<span>', '</div>': '</span>', '<span><br></span>': '<br>' }
+
+        Object.keys(replaceKeywords).forEach((tag) => {
+            refactoredHtml = refactoredHtml.replaceAll(tag, replaceKeywords[tag])
+        })
+
+        // check if any text is without tag if so then convert it to tagged text
+        const checkingElement = document.createElement('div');
+        checkingElement.innerHTML = refactoredHtml;
+        // remove tagged text and element
+        checkingElement.querySelectorAll('span').forEach(span => span.remove())
+        checkingElement.querySelectorAll('br').forEach(span => span.remove())
+        // after removing tagged text if still something left (non-tagged text)
+        if (checkingElement.innerHTML) {
+            refactoredHtml = refactoredHtml.replaceAll(checkingElement.innerHTML, `<span>${checkingElement.innerHTML}</span>`)
+        }
+
+        return refactoredHtml;
+    }
+
+    const spanTagText = [];
+    html = refactorGivenHtml();
+    const htmlHolder = document.createElement('span');
+    htmlHolder.innerHTML = html;
+    htmlHolder.querySelectorAll('span').forEach((span) => {
+        // if span tag contain more span tag inside
+        const spanPresent = span.querySelectorAll('span');
+        if (spanPresent) {
+            // remove them (because they are duplicate tags)
+            spanPresent.forEach((span) => {
+                span.remove()
+            })
+        }
+        spanTagText.push(span.innerText);
+    })
+
+    // if no text present in html
+    if (spanTagText.length === 0) { return "" }
+
+    let convertedToText = ""
+    // after every <span> text there is a <br> tag (means new line)
+    for (let i = 0; i < spanTagText.length; i++) {
+        // save text
+        convertedToText += spanTagText[i];
+        if (i !== spanTagText.length - 1) {
+            // save new line
+            convertedToText += '\n';
+        }
+    }
+
+    return convertedToText;
+}
+
 
 function returnNoteViewHTML(note) {
 
     function getCombinedLabelsHTML(labelsList) {
-        let html = "";
+        let allLabelsHTML = "";
         labelsList.forEach((label) => {
-            html += `<span class="label"><p>${label.textContent.trim()}</p><span class=" close-button"><i class="fas fa-times"></i></span></span>`;
+            const element = document.createElement('span');
+            element.setAttribute('class', 'avoid_Noteview label');
+            element.innerHTML = `<p></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
+            element.querySelector('p').innerText = label.innerText.trim();
+            allLabelsHTML += element.outerHTML;
         });
-        return html;
+
+        return allLabelsHTML;
     }
 
-    const noteTitle = note.querySelector(".title").textContent;
-    const noteContent = note.querySelector(".content").textContent;
+    const noteTitle = note.querySelector(".title").innerHTML;
+    const noteContent = note.querySelector(".content").innerHTML;
     const noteLabels = Array.from(note.querySelectorAll(".note-labels .label"));
 
 
@@ -21,20 +85,25 @@ function returnNoteViewHTML(note) {
     noteViewArea.classList.add("note-view-area");
     noteViewArea.classList.add("back-screen");
 
-    const viewNoteHTML = `
-    <div class="note">
-            <div class="note-head">
-                <h4 contenteditable="true" class="title">${noteTitle.trim()}</h4>
-                <span class="more-icon"><span class="avoid_MoreOptions more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
-            </div>
-            <div class="note-body">
-                <p contenteditable="true" class="content">${noteContent.trim()}</p>
-                ${noteLabels ? `<div class="note-labels">${getCombinedLabelsHTML(noteLabels)}</div>` : ""}
-            </div>
-        </div>
-    `;
+    const noteElement = document.createElement('div');
+    noteElement.setAttribute('class', 'removeMe')
+    noteElement.setAttribute('id', note.id);
+    noteElement.setAttribute('class', "note");
 
-    noteViewArea.innerHTML = viewNoteHTML;
+    noteElement.innerHTML = `
+    <div class="note-head">
+        <h4 contenteditable="true" class="title"></h4>
+        <span class="more-icon"><span class="avoid_MoreOptions more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
+    </div>
+    <div class="note-body">
+        <p contenteditable="true" class="content"></p>
+        ${noteLabels ? `<div class="note-labels">${getCombinedLabelsHTML(noteLabels)}</div>` : ""}
+    </div>`;
+
+    noteElement.querySelector('.content').innerHTML = noteContent;
+    noteElement.querySelector('.title').innerHTML = noteTitle;
+
+    noteViewArea.innerHTML = noteElement.outerHTML;
     return noteViewArea;
 }
 
@@ -56,11 +125,12 @@ function makeNotesViewable() {
 
             if (!viewingNoteInputClass.contains('title') && !viewingNoteInputClass.contains('content')) { return }
 
-            const noteTitle = viewingNoteContainer.querySelector('.title').textContent;
-            const noteContent = viewingNoteContainer.querySelector('.content').textContent;
+            // while saving convert "Title/Content" html tags to text format
+            const noteTitle = convertNoteContentHtmlToText(viewingNoteContainer.querySelector('.title').innerHTML);
+            const noteContent = convertNoteContentHtmlToText(viewingNoteContainer.querySelector('.content').innerHTML);
             const noteLabels = Array.from(viewingNoteContainer.querySelectorAll('.label'));
 
-            const note = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.textContent }));
+            const note = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.innerText }));
             note.id = noteID;
             note.save();
         })
@@ -92,7 +162,6 @@ function makeNotesViewable() {
 
             onEditSaveNote(clickedNote.id);
             isNoteViewing = true;
-
 
             // onclicking outside note-viewing-area (blackish part)
             document.querySelector(".note-view-area").addEventListener("click", (e) => {
@@ -152,17 +221,18 @@ function makeRemoveLabel(noteId = "") {
         currentLabel.remove();
 
         let newNote = "";
+        // id given means the note is clicked for viewing
         if (noteId) {
-            // id given means the note is clicked for viewing
-            const noteTitle = document.querySelector('.note-view-area .title').textContent;
-            const noteContent = document.querySelector('.note-view-area .content').textContent;
+            // while saving convert "Title/Content" html tags to text format
+            const noteTitle = convertNoteContentHtmlToText(document.querySelector('.note-view-area .title').innerHTML);
+            const noteContent = convertNoteContentHtmlToText(document.querySelector('.note-view-area .content').innerHTML);
             const noteLabels = Array.from(document.querySelectorAll('.note-view-area .note-labels .label'));
             newNote = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.textContent }));
 
         } else {
             // id means the note is not opened seprately
-            const noteTitle = note.querySelector('.title').textContent;
-            const noteContent = note.querySelector('.content').textContent;
+            const noteTitle = convertNoteContentHtmlToText(note.querySelector('.title').innerHTML);
+            const noteContent = convertNoteContentHtmlToText(note.querySelector('.content').innerHTML);
             const noteLabels = Array.from(note.querySelectorAll('.note-labels .label'));
             currentLabel.remove();
             newNote = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.textContent }));
