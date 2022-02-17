@@ -54,6 +54,7 @@
     position: relative;
 }
 
+/* ------------------------------------------------------------------------------ */
 .note .note-head .more-icon .more-icon-circles {
     padding: 0.1rem 0.2rem;
     display: flex;
@@ -383,3 +384,5 @@ input[type="checkbox"] {
     letter-spacing: 0.2px;
     text-transform: none;
 }
+
+/* -------------------------------------------------------------------------------- */

@@ -1,7 +1,8 @@
-import { makeNotesViewable, makeRemoveLabel } from "../home/helperFunctions.js";
+import { makeNotesViewable, makeRemoveLabel } from "../public/helperFunctions.js";
+import { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel } from "./addFunctionHelper.js";
 
 // NewLine Bug Fix: Takes text for title/content and converts them to html tags (span, br) 
-function convertTextToHtml(text) {
+function convertTextToNoteHtml(text) {
 
     // if no text saved
     if (!text) { return '' }
@@ -29,7 +30,7 @@ function convertTextToHtml(text) {
 
 
 // display all notes in frontend
-function populateNotes() {
+function displayAllNotes() {
 
     function returnSingleNoteHTML(note) {
 
@@ -65,8 +66,8 @@ function populateNotes() {
                 </div>`;
 
         // Convert Text to Html Tags
-        noteElement.querySelector('.content').innerHTML = convertTextToHtml(noteContent);
-        noteElement.querySelector('.title').innerHTML = convertTextToHtml(noteTitle);
+        noteElement.querySelector('.content').innerHTML = convertTextToNoteHtml(noteContent);
+        noteElement.querySelector('.title').innerHTML = convertTextToNoteHtml(noteTitle);
 
         return noteElement;
     }
@@ -105,7 +106,7 @@ function populateNotes() {
 
 
 // Update individual note on frontEnd
-function updateNoteData(noteId) {
+function updateNote(noteId) {
 
     const allSavedNotes = JSON.parse(localStorage.getItem("notes"));
     const updatingNote = allSavedNotes.filter((note) => note.id == noteId)[0];
@@ -139,8 +140,8 @@ function updateNoteData(noteId) {
     }
 
     // Update Title and Content, convert Text to Html Tags
-    existingNote.querySelector(".title").innerHTML = convertTextToHtml(updatingNote.title);
-    existingNote.querySelector(".content").innerHTML = convertTextToHtml(updatingNote.content);
+    existingNote.querySelector(".title").innerHTML = convertTextToNoteHtml(updatingNote.title);
+    existingNote.querySelector(".content").innerHTML = convertTextToNoteHtml(updatingNote.content);
 
     // Update Labels if any
     if (existingNote.querySelector(".note-labels")) {
@@ -155,7 +156,7 @@ function updateNoteData(noteId) {
 
 
 // Function for displaying more-options
-function promptMoreOptions(noteId, noteView = false) {
+function showMoreOptionsDialogBox(noteId, noteView = false) {
     const moreOptionsMenu = [];
     const clickedNoteForMenu = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteId)[0];
     const noteLabels = clickedNoteForMenu.labels;
@@ -207,109 +208,128 @@ function promptMoreOptions(noteId, noteView = false) {
 }
 
 
-// check if more option menu is showing
-let moreOptionPromted = false;
+// more option dialog box currently showing
+let moreOptionDialogBoxPresent = false;
 
-function showMoreOptions(noteId = '') {
-    const moreOptionCircleMenu = document.querySelectorAll('.more-icon-circles');
+// Display More Options Dialog Box
+function makeMoreOptionsIconFunction(noteId = '') {
 
-    moreOptionCircleMenu.forEach((circle) => {
-        circle.addEventListener('click', (e) => {
-            const note = noteId ? noteId : e.currentTarget.parentElement.parentElement.parentElement.id;
-            if (moreOptionPromted) {
-                const menuContainer = document.querySelector('.menu-container');
-                if (menuContainer) {
-                    menuContainer.remove();
+    function displayMoreOptionDialogBox(event) {
+
+        function getNoteId() {
+            let note = event.currentTarget;
+            for (let i = 0; i < 3; i++) { note = note.parentElement };
+            return note.id;
+        }
+
+        const note = noteId ? noteId : getNoteId();
+        // if already moreOption dialog present remove it and exit
+        if (moreOptionDialogBoxPresent) {
+            const menuContainer = document.querySelector('.menu-container');
+            if (menuContainer) { menuContainer.remove(); }
+            moreOptionDialogBoxPresent = false;
+            return;
+        }
+
+        // Show more-option dialog box
+        showMoreOptionsDialogBox(note, noteId ? true : false);
+
+        // Menu inside more-option dialog box
+        const menuBoxOption = document.body.querySelectorAll('.menu');
+        menuBoxOption.forEach((option) => {
+            option.addEventListener('click', (e) => {
+                // if user clicked "add label" option
+                if (e.target.textContent == "add label") {
+                    addLabelInNote(note);
                 }
-                moreOptionPromted = false;
-                return;
+            })
+        })
+
+        moreOptionDialogBoxPresent = true;
+
+        // if user clicked outside menubox remove the more-option prompt
+        document.body.addEventListener('click', (e) => {
+            if (!document.querySelector('.menu-container')) { return }
+
+            let clickedOnMenu = false;
+            if (e.target.classList.contains("avoid_MoreOptions")) {
+                clickedOnMenu = true;
             }
 
-            // Show more-option menu
-            promptMoreOptions(note, noteId ? true : false);
+            if (!clickedOnMenu) {
+                document.querySelector('.menu-container').remove();
+                moreOptionDialogBoxPresent = false;
+            }
+        })
+    }
 
-            const menuBoxOption = document.body.querySelectorAll('.menu');
-            menuBoxOption.forEach((option) => {
-                option.addEventListener('click', (e) => {
-                    // if user clicked "add label" option
-                    if (e.target.textContent == "add label") {
-                        addLabel(note);
-                    }
-                })
-            })
-
-            moreOptionPromted = true;
-
-            document.body.addEventListener('click', (e) => {
-                if (!document.querySelector('.menu-container')) { return }
-
-                let clickedOnMenuBox = false;
-                if (e.target.classList.contains("avoid_MoreOptions")) {
-                    clickedOnMenuBox = true;
-                }
-
-                // if user clicked outside menubox remove the more-option prompt
-                if (!clickedOnMenuBox) {
-                    document.querySelector('.menu-container').remove();
-                    moreOptionPromted = false;
-                }
-            })
+    // Make More Option Icon (Circles) Functionable
+    const moreOptionCircleIcons = document.querySelectorAll('.more-icon-circles');
+    moreOptionCircleIcons.forEach((circle) => {
+        circle.addEventListener('click', (e) => {
+            displayMoreOptionDialogBox(e)
         })
     })
 }
 
-import { returnLabelHTML, returnFullAddLabelHTML, showAlreadyAddedLabel, searchLabel, createLabel } from "./addFunctionHelper.js";
 
-function addLabel(noteId) {
+function addLabelInNote(noteId) {
 
-    let labels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
+    let savedLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
     const menuBox = document.body.querySelector('.menu-box');
 
-    if (menuBox) {
-        menuBox.style.minWidth = "130px";
-        menuBox.innerHTML = returnFullAddLabelHTML(labels);
-        showAlreadyAddedLabel(noteId);
-    }
+    if (!menuBox) { return }
 
-    document.querySelector('.menu-container .search .search-text').addEventListener('click', (e) => {
+    menuBox.style.minWidth = "130px";
+    menuBox.innerHTML = returnFullAddLabelHTML(savedLabels);
+    checkAlreadyExistingNoteLabels(noteId);
+
+    // Search Bar Text if clicked remove default value
+    const searchText = document.querySelector('.menu-container .search .search-text');
+    searchText.addEventListener('click', (e) => {
         const searchBar = e.currentTarget;
         if (searchBar.textContent == "Type Label...") {
             searchBar.textContent = "";
         }
     })
 
-    document.querySelector('.menu-container').addEventListener('click', (e) => {
-        const targetClassList = e.target.classList;
-
-        if (!targetClassList.contains('search') && !targetClassList.contains('search-text')) {
-            const searchBar = document.querySelector('.menu-container .search .search-text');
-            if (!searchBar.textContent) {
-                searchBar.textContent = "Type Label...";
-            }
-        }
+    // Search Bar Text on empty fill with default value
+    const moreOptionDialogBox = document.querySelector('.menu-container');
+    moreOptionDialogBox.addEventListener('click', (e) => {
+        const clickedElementClasses = e.target.classList;
+        if (clickedElementClasses.contains('search') || clickedElementClasses.contains('search-text')) { return }
+        // user clicked outside searchbar - if searchText empty fill with default
+        const searchBar = document.querySelector('.menu-container .search .search-text');
+        if (!searchBar.textContent) { searchBar.textContent = "Type Label..."; }
     })
 
-    document.querySelector('.search-text').addEventListener('input', (e) => {
-        if (e.currentTarget.textContent !== "") {
+    // when user changes Search Bar Text
+    const searchBar = document.querySelector('.search-text');
+    searchBar.addEventListener('input', (e) => {
 
-            let noteId = e.currentTarget;
-            for (let i = 0; i < 6; i++) {
-                noteId = noteId.parentElement;
-            }
-            noteId = noteId.id;
-            const newLabel = searchLabel(e.currentTarget.textContent.trim());
-            const labelHTML = returnLabelHTML(newLabel);
-            document.querySelector('.search-result').innerHTML = labelHTML;
-            showAlreadyAddedLabel(noteId);
-            createLabel(noteId, e.currentTarget.textContent.trim());
-        } else {
-            const labelHTML = returnLabelHTML(labels);
-            document.querySelector('.search-result').innerHTML = labelHTML;
-            showAlreadyAddedLabel(noteId);
+        // Get Noteid where add label is called
+        let noteId = e.currentTarget;
+        for (let i = 0; i < 6; i++) {
+            noteId = noteId.parentElement;
         }
+        noteId = noteId.id;
+
+        // if search text is empty
+        if (e.currentTarget.textContent === "") {
+            const labelHTML = returnAllLabelOptionsHtml(savedLabels);
+            document.querySelector('.search-result').innerHTML = labelHTML;
+            checkAlreadyExistingNoteLabels(noteId);
+            return;
+        }
+
+        // if search text not empty
+        const searchFilteredLabels = searchNoteLabel(e.currentTarget.textContent.trim());
+        const labelHTML = returnAllLabelOptionsHtml(searchFilteredLabels);
+        document.querySelector('.search-result').innerHTML = labelHTML;
+        checkAlreadyExistingNoteLabels(noteId);
+        createNoteLabel(noteId, e.currentTarget.textContent.trim());
     });
 }
 
 
-
-export { updateNoteData, populateNotes, showMoreOptions, addLabel };
+export { updateNote, displayAllNotes, makeMoreOptionsIconFunction, addLabelInNote };

@@ -1,81 +1,94 @@
-import { makeRemoveLabel } from "../home/helperFunctions.js";
+import { makeRemoveLabel } from "../public/helperFunctions.js";
 import { Note } from "../classes.js";
-import {addLabel} from "./helperFunctions.js"
+import { addLabelInNote } from "./helperFunctions.js"
 
-let labels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
 
-function returnLabelHTML(labels) {
-    let html = '';
-    labels.forEach((label) => {
-        const container = document.createElement('div');
-        container.setAttribute('class', 'avoid_Noteview avoid_MoreOptions label')
-        container.innerHTML += `<input class="avoid_Noteview avoid_MoreOptions" type="checkbox" name="" value=""/><label class="avoid_Noteview avoid_MoreOptions"></label>`;
-        container.querySelector('label').innerText = label;
-        html += container.outerHTML;
+function returnAllLabelOptionsHtml(labelsList) {
+    let labelHtmlCombined = '';
+    labelsList.forEach((label) => {
+        const individualLabelHtml = document.createElement('div');
+        individualLabelHtml.setAttribute('class', 'avoid_Noteview avoid_MoreOptions label')
+        individualLabelHtml.innerHTML += `<input class="avoid_Noteview avoid_MoreOptions" type="checkbox" name="" value=""/><label class="avoid_Noteview avoid_MoreOptions"></label>`;
+        individualLabelHtml.querySelector('label').innerText = label;
+        labelHtmlCombined += individualLabelHtml.outerHTML;
     })
-    return html;
+    return labelHtmlCombined;
 }
 
-function returnFullAddLabelHTML(labels) {
-    let html = '<div class="avoid_Noteview avoid_MoreOptions search"><i class="fas fa-search avoid_MoreOptions"></i><div contenteditable="true" class="avoid_Noteview avoid_MoreOptions search-text">Type Label...</div></div><div class="avoid_Noteview avoid_MoreOptions search-result">';
-    html += returnLabelHTML(labels);
-    html += '</div>';
-    return html
+
+function returnFullAddLabelHTML(labelsList) {
+    let addLabelHtml = '<div class="avoid_Noteview avoid_MoreOptions search"><i class="fas fa-search avoid_MoreOptions"></i><div contenteditable="true" class="avoid_Noteview avoid_MoreOptions search-text">Type Label...</div></div><div class="avoid_Noteview avoid_MoreOptions search-result">';
+    addLabelHtml += returnAllLabelOptionsHtml(labelsList);
+    addLabelHtml += '</div>';
+    return addLabelHtml
 }
 
-function showAlreadyAddedLabel(noteId) {
+
+// check the label which are already there in note, so that user can see which labels the note already have
+function checkAlreadyExistingNoteLabels(noteId) {
     const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
     const noteLabels = note.labels;
 
+    // label which user see's inside addLabelInNote option
     const searchResultLabels = document.querySelectorAll('.menu-box .label')
     searchResultLabels.forEach((label) => {
         const labelText = label.querySelector('label').textContent;
+
+        // check if this label is present in the note
         const findIndex = noteLabels.findIndex((element) => element == labelText);
         if (!(findIndex === -1)) {
+            // if this label found in the note
             label.querySelector('input').checked = true;
         }
 
-        label.querySelector('input').addEventListener('change', (e) => {
+        // if user checked/unchecked the label
+        const labelCheckBox = label.querySelector('input');
+        labelCheckBox.addEventListener('change', (e) => {
 
-            let note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
-            let newNote = new Note(note.title, note.content, note.labels);
+            // new note to update existing note (localStorage)
+            const updateNote = new Note(note.title, note.content, note.labels);
+            updateNote.id = noteId;
 
-            newNote.id = noteId;
-
-            const checkboxLabel = e.currentTarget.parentElement.lastElementChild.textContent;
-
+            const checkboxLabelText = e.currentTarget.parentElement.lastElementChild.textContent;
             if (e.currentTarget.checked) {
-                newNote.labels.push(checkboxLabel);
-
+                // add check to label
+                updateNote.labels.push(checkboxLabelText);
             } else {
-                newNote.labels = newNote.labels.filter((label) => label !== checkboxLabel);
+                // remove check from label
+                updateNote.labels = updateNote.labels.filter((label) => label !== checkboxLabelText);
             }
 
-            newNote.save();
+            updateNote.save();
+            // make label remove button functionable (in notesArea section)
             makeRemoveLabel();
 
-            if (document.querySelector('.note-view-area')) {
-                document.querySelector('.note-view-area .note-labels').innerHTML = document.getElementById(noteId).querySelector('.note-labels').innerHTML;
-                makeRemoveLabel(noteId);
-            }
+            const noteViewArea = document.querySelector('.note-view-area');
+            if (!noteViewArea) { return }
+
+            const noteViewAreaLabels = noteViewArea.querySelector('.note-labels');
+            const actualNoteLabels = document.getElementById(noteId).querySelector('.note-labels');
+            noteViewAreaLabels.innerHTML = actualNoteLabels.innerHTML;
+            // make label remove button functionable (in noteView Mode)
+            makeRemoveLabel(noteId);
         })
     })
 }
 
-function searchLabel(label) {
+
+function searchNoteLabel(labelToSearch) {
     let matchedLabel = [];
     const allLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
     if (!allLabels) {
         return [];
     }
-    if(!label){
+    if (!labelToSearch) {
         return allLabels;
     }
     for (let i = 0; i < allLabels.length; i++) {
         let matchFound = true;
 
-        for (let x = 0; x < label.length; x++) {
-            if (label[x] != allLabels[i][x]) {
+        for (let x = 0; x < labelToSearch.length; x++) {
+            if (labelToSearch[x] != allLabels[i][x]) {
                 matchFound = false;
                 break;
             }
@@ -90,68 +103,89 @@ function searchLabel(label) {
     return matchedLabel;
 }
 
-function createLabel(noteId, label) {
 
-    function crateLabelHTML() {
+function createNoteLabel(noteId, labelToAdd) {
 
-        const htmlHolder = document.createElement('span');
-        htmlHolder.innerHTML = `<i class="fas fa-plus-circle avoid_Noteview avoid_MoreOptions create-label-icon" aria-hidden="true"></i><p class="avoid_Noteview avoid_MoreOptions create-label-text">Create - <span class="avoid_Noteview avoid_MoreOptions create-label-highlighted"></span></p>`;
-        htmlHolder.querySelector('.create-label-highlighted').innerText = label;
+    function createLabelButtonHTML() {
 
-        if (document.querySelector('.menu-container .create-label-container')) {
-            document.querySelector('.menu-container .create-label-container').innerHTML = htmlHolder.innerHTML;
-        } else {
-            const createLabel = document.createElement('div');
-            createLabel.className = "avoid_Noteview avoid_MoreOptions create-label-container";
-            createLabel.innerHTML = htmlHolder.innerHTML;
-            document.querySelector('.menu-container').appendChild(createLabel);
-            document.querySelector('.create-label-container').addEventListener('click', () => {
-                const label = document.querySelector('.create-label-highlighted').innerText;
-                const labelIndex = labels.findIndex((element) => element == label);
-                if (labelIndex == -1) {
-                    const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
-                    const newNote = new Note(note.title, note.content, [...note.labels, label]);
-                    newNote.id = note.id;
-                    const newLabels = [...localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [], label]
-                    localStorage.setItem('labels', JSON.stringify(newLabels));
-                    newNote.save();
-                    addLabel(noteId);
-                }
-            })
+        const buttonHTML = document.createElement('span');
+        buttonHTML.innerHTML = `<i class="fas fa-plus-circle avoid_Noteview avoid_MoreOptions create-label-icon" aria-hidden="true"></i><p class="avoid_Noteview avoid_MoreOptions create-label-text">Create - <span class="avoid_Noteview avoid_MoreOptions create-label-highlighted"></span></p>`;
+
+        const createLabelHighlightedName = buttonHTML.querySelector('.create-label-highlighted');
+        createLabelHighlightedName.innerText = labelToAdd;
+
+        const createButtonExists = document.querySelector('.menu-container .create-label-container');
+        if (createButtonExists) {
+            createButtonExists.innerHTML = buttonHTML.innerHTML;
+            return;
         }
+
+        const createButtonDiv = document.createElement('div');
+        createButtonDiv.className = "avoid_Noteview avoid_MoreOptions create-label-container";
+        createButtonDiv.innerHTML = buttonHTML.innerHTML;
+
+        const addLabelArea = document.querySelector('.menu-container');
+        addLabelArea.appendChild(createButtonDiv);
+
+        const createButtonDivContainer = document.querySelector('.create-label-container');
+        createButtonDivContainer.addEventListener('click', () => {
+
+            const labelToCreate = document.querySelector('.create-label-highlighted').innerText;
+            const labelAlreadyExists = allSavedLabels.findIndex((element) => element == labelToCreate);
+            if (labelAlreadyExists !== -1) { return }
+
+            // if label not already exists
+            const noteToUpdate = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
+            const updatedNote = new Note(noteToUpdate.title, noteToUpdate.content, [...noteToUpdate.labels, labelToCreate]);
+            updatedNote.id = noteToUpdate.id;
+
+            // add newly added label to allLabels (localStorage)
+            const newLabels = [...localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [], labelToCreate]
+            localStorage.setItem('labels', JSON.stringify(newLabels));
+            updatedNote.save();
+
+            // refresh addLabelInNote Dialog Box
+            addLabelInNote(noteId);
+
+            // remove createButton
+            const createButtonContainer = document.body.querySelector('.create-label-container');
+            if (createButtonContainer) {
+                createButtonContainer.remove();
+            }
+
+        })
+
     }
 
-    if (!label) {
-        if (document.body.querySelector('.create-label-container')) {
-            document.body.querySelector('.create-label-container').remove();
-            document.body.querySelector('.menu-container').style.paddingBottom = '1rem';
-        }
-        return;
+    // If label is empty
+    const moreOptionDialogBox = document.body.querySelector('.menu-container');
+    if (!labelToAdd) {
+        const createLabelOption = document.body.querySelector('.create-label-container');
+        if (!createLabelOption) { return }
+        createLabelOption.remove();
+        moreOptionDialogBox.style.paddingBottom = '1rem';
     }
 
-    let labelFound = false;
-
-    for (let i = 0; i < labels.length; i++) {
-        if (label == labels[i]) {
-            labelFound = true;
+    const allSavedLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
+    let labelAlreadyExists = false;
+    for (let i = 0; i < allSavedLabels.length; i++) {
+        if (labelToAdd == allSavedLabels[i]) {
+            labelAlreadyExists = true;
             break;
         }
     }
 
-
-    if (!labelFound) {
-
-        document.body.querySelector('.menu-container').style.paddingBottom = 0;
-        crateLabelHTML();
-
-    } else {
-        document.body.querySelector('.menu-container').style.paddingBottom = '1rem';
-        if (document.body.querySelector('.create-label-container')) {
-            document.body.querySelector('.create-label-container').remove();
-        }
+    if (labelAlreadyExists) {
+        // Don't show createLabel button
+        moreOptionDialogBox.style.paddingBottom = '1rem';
+        const createLabelOption = document.body.querySelector('.create-label-container');
+        if (createLabelOption) { createLabelOption.remove(); }
+        return
     }
 
-    // makeAddFunctionable();
+    moreOptionDialogBox.style.paddingBottom = 0;
+    createLabelButtonHTML();
 }
 
-export {returnLabelHTML, returnFullAddLabelHTML, showAlreadyAddedLabel, searchLabel, createLabel};
+
+export { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel };

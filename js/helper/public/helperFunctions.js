@@ -1,5 +1,5 @@
 import { Note } from "../classes.js";
-import { showMoreOptions } from "../note/helperFunctions.js";
+import { makeMoreOptionsIconFunction } from "../note/helperFunctions.js";
 
 // NewLine Bug Fix: Takes innerHtml(span, br) and converts it to text with newline (\n)
 function convertNoteContentHtmlToText(html) {
@@ -152,7 +152,7 @@ function makeNotesViewable() {
             // make note view label's remove button functionable
             makeRemoveLabel(clickedNote.id)
             // make note view more-option button functionable
-            showMoreOptions(clickedNote.id);
+            makeMoreOptionsIconFunction(clickedNote.id);
 
             const bodyStyle = document.querySelector("body").style;
             // freeze scrolling
@@ -177,7 +177,7 @@ function makeNotesViewable() {
 
                 // After removing note's label it is refressed and new note instance is made: make new note's buttons functionable
                 makeRemoveLabel();
-                showMoreOptions();
+                makeMoreOptionsIconFunction();
             });
         });
     });

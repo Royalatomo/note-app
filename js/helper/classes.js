@@ -1,4 +1,4 @@
-import { updateNoteData, populateNotes } from "./note/helperFunctions.js";
+import { updateNote, displayAllNotes } from "./note/helperFunctions.js";
 
 class Note {
     constructor(title = "", content = "", labels = []) {
@@ -29,7 +29,7 @@ class Note {
                 localStorage.setItem("notes", JSON.stringify([{ id: this.id, title: this.title, content: this.content, labels: this.labels, isArchive: this.isArchive, isTrash: this.isTrash }]));
 
                 // insert all notes in frontEnd
-                populateNotes();
+                displayAllNotes();
                 return;
             }
 
@@ -67,10 +67,10 @@ class Note {
 
             if (isNoteIdPresent) {
                 // if note already present: update only that note in frontEnd
-                updateNoteData(this.id);
+                updateNote(this.id);
             } else {
                 // if note added: insert all notes again in frontEnd
-                populateNotes();
+                displayAllNotes();
             }
         };
 
@@ -118,5 +118,6 @@ class Note {
         };
     }
 }
+
 
 export { Note }

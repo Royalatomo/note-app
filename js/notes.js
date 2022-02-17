@@ -1,9 +1,9 @@
 
 // Note Object
-import {populateNotes, showMoreOptions} from "./helper/note/helperFunctions.js";
-import {makeNotesViewable} from "./helper/home/helperFunctions.js";
+import { displayAllNotes, makeMoreOptionsIconFunction } from "./helper/note/helperFunctions.js";
+import { makeNotesViewable } from "./helper/public/helperFunctions.js";
 
 // Populate Notes into notes area
-populateNotes();
+displayAllNotes();
 makeNotesViewable();
-showMoreOptions();
+makeMoreOptionsIconFunction();
