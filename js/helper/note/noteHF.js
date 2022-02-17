@@ -39,7 +39,7 @@ function displayAllNotes() {
             note.labels.forEach((label) => {
                 const element = document.createElement('span');
                 element.setAttribute('class', 'avoid_Noteview label');
-                element.innerHTML = `<p></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
+                element.innerHTML = `<p class="label-text"></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
                 element.querySelector('p').innerText = label;
                 allLabelsHTML += element.outerHTML;
             });
@@ -130,7 +130,7 @@ function updateNote(noteId) {
         updatingNote.labels.forEach((label) => {
             const element = document.createElement('span');
             element.setAttribute('class', 'avoid_Noteview label');
-            element.innerHTML = `<p></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
+            element.innerHTML = `<p class="label-text"></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
             element.querySelector('p').innerText = label;
             allCombinedLabelsHTML += element.outerHTML;
         });
@@ -152,6 +152,15 @@ function updateNote(noteId) {
             existingNote.querySelector(".note-body").appendChild(freshLabels);
         }
     }
+
+    const noteViewArea = document.querySelector('.note-view-area');
+    if (!noteViewArea) { return }
+
+    const noteViewAreaLabels = noteViewArea.querySelector('.note-labels');
+    const actualNoteLabels = document.getElementById(noteId).querySelector('.note-labels');
+    noteViewAreaLabels.innerHTML = actualNoteLabels.innerHTML;
+    // make label remove button functionable (in noteView Mode)
+    makeRemoveLabel(noteId);
 }
 
 

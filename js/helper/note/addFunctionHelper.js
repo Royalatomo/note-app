@@ -1,4 +1,4 @@
-import { makeRemoveLabel } from "../allHF.js";
+import { makeRemoveLabel, getNoteViewing } from "../allHF.js";
 import { Note } from "../classes.js";
 import { addLabelInNote } from "./noteHF.js"
 
@@ -8,7 +8,7 @@ function returnAllLabelOptionsHtml(labelsList) {
     labelsList.forEach((label) => {
         const individualLabelHtml = document.createElement('div');
         individualLabelHtml.setAttribute('class', 'avoid_Noteview avoid_MoreOptions label')
-        individualLabelHtml.innerHTML += `<input class="avoid_Noteview avoid_MoreOptions" type="checkbox" name="" value=""/><label class="avoid_Noteview avoid_MoreOptions"></label>`;
+        individualLabelHtml.innerHTML += `<input class="avoid_Noteview avoid_MoreOptions" type="checkbox" name="" value=""/><label class="avoid_Noteview avoid_MoreOptions label-text"></label>`;
         individualLabelHtml.querySelector('label').innerText = label;
         labelHtmlCombined += individualLabelHtml.outerHTML;
     })
@@ -64,46 +64,36 @@ function checkAlreadyExistingNoteLabels(noteId) {
             updateNote.save();
             // make label remove button functionable (in notesArea section)
             makeRemoveLabel();
-
-            const noteViewArea = document.querySelector('.note-view-area');
-            if (!noteViewArea) { return }
-
-            const noteViewAreaLabels = noteViewArea.querySelector('.note-labels');
-            const actualNoteLabels = document.getElementById(noteId).querySelector('.note-labels');
-            noteViewAreaLabels.innerHTML = actualNoteLabels.innerHTML;
-            // make label remove button functionable (in noteView Mode)
-            makeRemoveLabel(noteId);
         })
     })
 }
 
 
 function searchNoteLabel(labelToSearch) {
-    let matchedLabel = [];
-    const allLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
-    if (!allLabels) {
-        return [];
-    }
-    if (!labelToSearch) {
-        return allLabels;
-    }
-    for (let i = 0; i < allLabels.length; i++) {
-        let matchFound = true;
+    let searchFoundLabels = [];
+    const allSavedLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
+    if (!allSavedLabels) { return []; }
 
+    // if search is empty show all available labels to add/remove
+    if (!labelToSearch) { return allSavedLabels; }
+
+    for (let i = 0; i < allSavedLabels.length; i++) {
+        let matchFound = true;
+        // try to match every single words
         for (let x = 0; x < labelToSearch.length; x++) {
-            if (labelToSearch[x] != allLabels[i][x]) {
+            if (labelToSearch[x] != allSavedLabels[i][x]) {
                 matchFound = false;
                 break;
             }
         }
 
         if (matchFound) {
-            matchedLabel.push(allLabels[i])
+            searchFoundLabels.push(allSavedLabels[i])
             matchFound = false;
         }
     }
 
-    return matchedLabel;
+    return searchFoundLabels;
 }
 
 
@@ -150,11 +140,18 @@ function createNoteLabel(noteId, labelToAdd) {
             // refresh addLabelInNote Dialog Box
             addLabelInNote(noteId);
 
+            if (getNoteViewing()) {
+                console.log("HELLO");
+                makeRemoveLabel(noteId);
+            } else {
+                console.log("HELLO");
+                makeRemoveLabel();
+            }
+
+
             // remove createButton
             const createButtonContainer = document.body.querySelector('.create-label-container');
-            if (createButtonContainer) {
-                createButtonContainer.remove();
-            }
+            if (createButtonContainer) { createButtonContainer.remove(); }
 
         })
 

@@ -68,7 +68,7 @@ function returnNoteViewHTML(note) {
         labelsList.forEach((label) => {
             const element = document.createElement('span');
             element.setAttribute('class', 'avoid_Noteview label');
-            element.innerHTML = `<p></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
+            element.innerHTML = `<p class="label-text"></p><span class="avoid_Noteview close-button"><i class="fas fa-times"></i></span>`;
             element.querySelector('p').innerText = label.innerText.trim();
             allLabelsHTML += element.outerHTML;
         });
@@ -199,12 +199,13 @@ function makeRemoveLabel(noteId = "") {
 
         promptBox.innerHTML =
             `<div class="msg-box">
-            <p class="msg">are you sure you want to remove <span>${tag}</span> tag?</p>
+            <p class="msg">are you sure you want to remove <span class="label-name"></span> tag?</p>
             <div class="msg-button">
                 <button class="red">Yes</button>
                 <button class="green">No</button>
             </div>
         </div>`;
+        promptBox.querySelector('.label-name').innerText = tag;
 
         // add promptBox in body
         document.body.appendChild(promptBox);
@@ -288,4 +289,7 @@ function makeRemoveLabel(noteId = "") {
 }
 
 
-export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel }
+function getNoteViewing() {
+    return isNoteViewing;
+}
+export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel, getNoteViewing }
