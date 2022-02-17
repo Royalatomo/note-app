@@ -1,4 +1,4 @@
-import { makeNotesViewable, makeRemoveLabel } from "../public/helperFunctions.js";
+import { makeNotesViewable, makeRemoveLabel } from "../allHF.js";
 import { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel } from "./addFunctionHelper.js";
 
 // NewLine Bug Fix: Takes text for title/content and converts them to html tags (span, br) 

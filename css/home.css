@@ -12,7 +12,7 @@
     margin-bottom: 3rem;
     border-radius: 1rem;
     box-shadow: 2px 2px 8px black;
-    word-break: break-all;
+    word-break: break-word;
 }
 
 /* Notes-Area Container - Individual Notes */
@@ -385,4 +385,19 @@ input[type="checkbox"] {
     text-transform: none;
 }
 
+
+
+.more-icon .label{
+    direction: ltr;
+    display: flex;
+    align-items: center;
+}
+
+.more-icon .label input{
+    order: 2;
+}
+
+.more-icon .label label{
+    order: 1;
+}
 /* -------------------------------------------------------------------------------- */

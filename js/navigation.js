@@ -1,4 +1,4 @@
-import { removeLabelsFromNav, addLabelsToNav } from "./helper/navigation/helperFunctions.js";
+import { removeLabelsFromNav, addLabelsToNav } from "./helper/navigationHF.js";
 
 
 const navMenuContainer = document.querySelector(".hamburger-menu");

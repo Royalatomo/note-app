@@ -1,6 +1,6 @@
-import { makeRemoveLabel } from "../public/helperFunctions.js";
+import { makeRemoveLabel } from "../allHF.js";
 import { Note } from "../classes.js";
-import { addLabelInNote } from "./helperFunctions.js"
+import { addLabelInNote } from "./noteHF.js"
 
 
 function returnAllLabelOptionsHtml(labelsList) {
@@ -44,6 +44,9 @@ function checkAlreadyExistingNoteLabels(noteId) {
         // if user checked/unchecked the label
         const labelCheckBox = label.querySelector('input');
         labelCheckBox.addEventListener('change', (e) => {
+
+            // get note which refreshed labels (if added/removed labels)
+            const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
 
             // new note to update existing note (localStorage)
             const updateNote = new Note(note.title, note.content, note.labels);

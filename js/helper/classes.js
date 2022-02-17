@@ -1,4 +1,4 @@
-import { updateNote, displayAllNotes } from "./note/helperFunctions.js";
+import { updateNote, displayAllNotes } from "./note/noteHF.js";
 
 class Note {
     constructor(title = "", content = "", labels = []) {

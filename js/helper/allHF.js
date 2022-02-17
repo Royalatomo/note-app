@@ -1,5 +1,5 @@
-import { Note } from "../classes.js";
-import { makeMoreOptionsIconFunction } from "../note/helperFunctions.js";
+import { Note } from "./classes.js";
+import { makeMoreOptionsIconFunction } from "./note/noteHF.js";
 
 // NewLine Bug Fix: Takes innerHtml(span, br) and converts it to text with newline (\n)
 function convertNoteContentHtmlToText(html) {
