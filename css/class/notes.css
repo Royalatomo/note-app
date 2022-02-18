@@ -1,0 +1,22 @@
+@import "./helperClass/notes/notes-head.css";
+@import "./helperClass/notes/notes-body.css";
+
+
+/* - Notes Container - */
+.notes-area {
+    padding: 5rem 2.5rem;
+    position: absolute;
+    width: 100%;
+}
+
+/* - Notes - */
+.note {
+    position: relative;
+    margin-bottom: 3rem;
+    border-radius: 1rem;
+    box-shadow: 2px 2px 8px black;
+    word-break: break-word;
+}
+.note:hover {
+    box-shadow: 5px 5px 20px rgb(0, 0, 0);
+}

@@ -1,0 +1,68 @@
+/* Confirmation Pop-up Box - Container */
+.prompt {
+    position: fixed;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: #00000082;
+    top: 0;
+    left: 0;
+}
+
+/* Pop-up Box */
+.prompt .msg-box {
+    border-radius: 20px;
+    background: #f1e8e8;
+    padding: 1rem 2rem;
+    box-shadow: 1px 1px 17px black;
+}
+
+/* Pop-up Box - Text */
+.prompt .msg-box .msg {
+    margin-bottom: 1rem;
+}
+
+/* Pop-up Box - Text Label Name */
+.prompt .msg-box .msg .label-name {
+    color: red;
+    font-family: cursive;
+}
+
+/* Pop-up Box - Red/Green Buttons */
+.prompt .msg-box .msg-button {
+    display: flex;
+    justify-content: center;
+}
+
+/* Pop-up Box - Red Button */
+.prompt .msg-box .msg-button .red {
+    margin-right: 2rem;
+    border: none;
+    font-size: 1rem;
+    font-weight: bolder;
+    color: white;
+    background: #ff0000;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+
+/* Pop-up Box - Green Button */
+.prompt .msg-box .msg-button .green {
+    margin-right: 2rem;
+    border: none;
+    font-size: 1rem;
+    font-weight: bolder;
+    color: white;
+    background: #00b500;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+}
+
+
+.prompt .msg-box .msg-button .red:hover,
+.prompt .msg-box .msg-button .green:hover {
+    cursor: pointer;
+}

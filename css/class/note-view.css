@@ -1,0 +1,55 @@
+/* Note View Section */
+.note-view-area {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    background: #000000bf;
+    padding: 1rem 2rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+}
+
+/* Note View - Note */
+.note-view-area .note {
+    background: rgb(253, 253, 253);
+    padding-bottom: 0.5rem;
+    margin: 0 auto;
+    word-break: break-all;
+}
+.note-view-area .note:hover {
+    box-shadow: 2px 2px 8px black;
+}
+
+/* Note View - Note Title */
+.note-view-area .note .note-head .title {
+    text-align: center;
+    max-height: 80px;
+    overflow-y: scroll;
+    padding-right: 5px;
+}
+
+
+/* Note View - Note Content */
+.note-view-area .note .note-body .content {
+    max-height: 280px;
+    overflow-y: scroll;
+}
+
+
+/* Note View - Note Labels Container */
+.note-view-area .note .note-body .note-labels {
+    max-height: 70px;
+    overflow-y: scroll;
+    padding-bottom: 0.2rem;
+}
+
+
+/* Note View - On Clicking Note Input Areas */
+.note-view-area .note .note-head .title:focus-visible,
+.note-view-area .note .note-body .content:focus-visible,
+.note-view-area .note .note-body .note-labels:focus-visible{
+    outline: none;
+}

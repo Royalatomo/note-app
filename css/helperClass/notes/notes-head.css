@@ -1,0 +1,106 @@
+@import "./individual-option-css/addLabel.css";
+
+
+/* - Note Head Section - */
+.note .note-head {
+    border-bottom: 2px solid #0000004f;
+    display: flex;
+    padding: 0.5rem 0;
+    padding-top: 1.2rem;
+    padding-left: 1rem;
+}
+
+/* Title */
+.note .note-head .title {
+    font-family: 'Merriweather', sans-serif;
+    letter-spacing: 0.1rem;
+    margin: 0 auto;
+    line-height: 1.4;
+    font-size: 1.1rem;
+    text-align: center;
+    max-height: 150px;
+    overflow-y: scroll;
+    color: #001b44;
+}
+
+
+/* More Option Icon Container */
+.note .note-head .more-icon {
+    font-size: 0.5rem;
+    display: flex;
+    align-items: center;
+    color: #00a8d6;
+    margin-right: 1rem;
+    margin-left: 0.5rem;
+    position: relative;
+}
+
+/* More Option Circle Container */
+.note .note-head .more-icon .more-icon-circles {
+    padding: 0.1rem 0.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* More Option Circle Icon */
+.note .note-head .more-icon .more-icon-circles .fa-circle {
+    margin-bottom: 0.2rem;
+}
+
+
+/* More Option Dialog Box */
+.note .note-head .more-icon .menu-container {
+    position: absolute;
+    font-size: 1rem;
+    width: fit-content;
+    top: 0;
+    transform: translateX(-105%);
+    padding: 1rem 0;
+    box-shadow: 0px 0px 7px #000000ad;
+    border-radius: 13px;
+    background: #ffffff;
+    color: white;
+    z-index: 1;
+}
+
+/* More-Option All Options Container */
+.note .note-head .more-icon .menu-container .menu-box {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    color: #444444;
+    text-transform: capitalize;
+    line-height: 1.7;
+
+}
+
+/* More-Option Individual Options */
+.note .note-head .more-icon .menu-container .menu-box .menu {
+    display: inline-block;
+    min-width: 130px;
+    list-style: none;
+    color: #444444;
+    text-transform: capitalize;
+    line-height: 1.7;
+    padding: 0 15px;
+}
+.note .note-head .more-icon .menu-container .menu-box .menu:hover {
+    background-color: #80808040;
+    cursor: pointer;
+}
+
+
+/* --- Scroll-Bar Css --- */
+
+/* Scroll Bar */
+.note .note-head .title::-webkit-scrollbar,
+.note .note-head .more-icon .menu-container .menu-box .search-result::-webkit-scrollbar {
+    width: 0.6rem;
+}
+
+/* Scroll Bar - Thumb */
+.note .note-head .title::-webkit-scrollbar-thumb,
+.note .note-head .more-icon .menu-container .menu-box .search-result::-webkit-scrollbar-thumb {
+    background-color: #ff8000;
+    border-left: 5px solid white;
+}

@@ -1,0 +1,99 @@
+/* Add Label - Option */
+
+/* Search Box Container */
+.note .note-head .more-icon .menu-container .menu-box .search {
+    color: #787878;
+    margin-bottom: 0.5rem;
+    width: 170px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    text-transform: none;
+    letter-spacing: 0.4px;
+    margin: 0 1rem 0.5rem;
+}
+
+/* Search Icon */
+.note .note-head .more-icon .menu-container .menu-box .search .fa-search {
+    width: 10%;
+}
+
+/* Searching Text */
+.note .note-head .more-icon .menu-container .menu-box .search .search-text {
+    margin-left: 0.8rem;
+    width: 80%;
+}
+.note .note-head .more-icon .menu-container .menu-box .search .search-text:focus {
+    outline: none;
+}
+
+/* Search Results Container */
+.note .note-head .more-icon .menu-container .menu-box .search-result {
+    color: black;
+    list-style: none;
+    max-height: 80px;
+    direction: rtl;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 0 0.8rem;
+    margin: 0 1rem 0.5rem;
+    text-transform: none;
+    letter-spacing: 0.4px;
+}
+.note .note-head .more-icon .menu-container .menu-box .search-result:focus-visible {
+    outline: none;
+}
+
+/* Search Result - Individual Label Container */
+.note .note-head .more-icon .menu-container .menu-box .search-result .label {
+    direction: ltr;
+    display: flex;
+    align-items: center;
+}
+
+/* Search Result - Individual Label Checkbox */
+.note .note-head .more-icon .menu-container .menu-box .search-result .label input[type="checkbox"] {
+    margin-left: 0.4rem;
+    order: 2;
+}
+
+/* Search Result - Individual Label Text */
+.note .note-head .more-icon .menu-container .menu-box .search-result .label .label-text {
+    order: 1;
+}
+
+
+/* Create Label Button Container */
+.note .note-head .more-icon .menu-container .create-label-container {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    max-width: inherit;
+    border-top: 2px solid #c1c1c1;
+}
+.note .note-head .more-icon .menu-container .create-label-container:hover {
+    background-color: rgb(238, 238, 238);
+    cursor: pointer;
+}
+
+/* Create Label Button Icon */
+.note .note-head .more-icon .menu-container .create-label-container .create-label-icon {
+    color: purple;
+    margin-right: 0.5rem;
+    transform: translateY(2px);
+}
+
+/* Create Label Button Text */
+.note .note-head .more-icon .menu-container .create-label-container .create-label-text {
+    color: black;
+    word-break: break-all;
+}
+
+/* Create Label Button - Highlighted Text(Label Name) */
+.note .note-head .more-icon .menu-container .create-label-container .create-label-text .create-label-highlighted {
+    font-weight: bold;
+    letter-spacing: 0.2px;
+    text-transform: none;
+}
