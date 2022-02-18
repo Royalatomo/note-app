@@ -1,5 +1,6 @@
 import { makeNotesViewable, makeRemoveLabel } from "../allHF.js";
-import { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel } from "./addFunctionHelper.js";
+import { Note } from "../classes.js";
+import { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel } from "./addLabelFunction.js";
 
 // NewLine Bug Fix: Takes text for title/content and converts them to html tags (span, br) 
 function convertTextToNoteHtml(text) {
@@ -30,7 +31,7 @@ function convertTextToNoteHtml(text) {
 
 
 // display all notes in frontend
-function displayAllNotes() {
+function displayAllNotes(notesList = "") {
 
     function returnSingleNoteHTML(note) {
 
@@ -80,7 +81,18 @@ function displayAllNotes() {
         notesContainingDiv.innerHTML = "";
     }
 
-    const allSavedNotes = localStorage.getItem("notes") ? JSON.parse(localStorage.getItem("notes")) : '';
+    // if notes given to show then, else show all notes from localStorage
+    function getNotesList() {
+        if (!notesList) {
+            const allNotes = JSON.parse(localStorage.getItem("notes"));
+            if (!allNotes) { return '' }
+            // show only that notes which are not trashed or archived
+            return allNotes.filter((element) => element.isTrash == false && element.isArchive == false);
+        }
+        return notesList;
+    }
+    const allSavedNotes = getNotesList();
+
     if (!allSavedNotes) { return }
 
     let allCombinedNotesHTML = "";
@@ -99,9 +111,11 @@ function displayAllNotes() {
         document.querySelector(".notes-area").innerHTML = allCombinedNotesHTML;
     }
 
-    // make note's button functionable
-    makeNotesViewable();
-    makeRemoveLabel();
+    if (!notesList) {
+        // make note's button functionable
+        makeNotesViewable();
+        makeRemoveLabel();
+    }
 }
 
 
@@ -165,24 +179,31 @@ function updateNote(noteId) {
 
 
 // Function for displaying more-options
-function showMoreOptionsDialogBox(noteId, noteView = false) {
+function showMoreOptionsDialogBox(noteId, noteView = false, customOption = []) {
     const moreOptionsMenu = [];
     const clickedNoteForMenu = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteId)[0];
     const noteLabels = clickedNoteForMenu.labels;
-    let isLabelPresent = false;
+    let addMoreSpace = false;
+    console.log('asdfasdfasdf');
 
-    if (noteLabels.length > 0) {
-        // if label present give "change label" option also
-        moreOptionsMenu.push('change label');
-        moreOptionsMenu.push('add label');
+    if (customOption.length > 0) {
+        customOption.forEach((option) => {
+            moreOptionsMenu.push(option);
+        })
     } else {
-        moreOptionsMenu.push('add label');
-        isLabelPresent = true;
-    }
+        if (noteLabels.length > 0) {
+            // if label present give "change label" option also
+            moreOptionsMenu.push('change label');
+            moreOptionsMenu.push('add label');
+        } else {
+            moreOptionsMenu.push('add label');
+            addMoreSpace = true;
+        }
 
-    if (!clickedNoteForMenu.isArchive) {
-        moreOptionsMenu.push('archive')
-        moreOptionsMenu.push('delete note')
+        if (!clickedNoteForMenu.isArchive) {
+            moreOptionsMenu.push('archive')
+            moreOptionsMenu.push('delete note')
+        }
     }
 
     // menu holding div - element
@@ -194,8 +215,8 @@ function showMoreOptionsDialogBox(noteId, noteView = false) {
     // menu holding div - html
     let mainDivHTML = '<ul class="avoid_Noteview avoid_MoreOptions menu-box">';
     moreOptionsMenu.forEach((menu) => {
-        mainDivHTML += `<li ${isLabelPresent ? 'style="min-width: 110px"' : ''} class="avoid_MoreOptions menu">${menu}</li>`;
-    })
+        mainDivHTML += `<li class="avoid_MoreOptions menu ${addMoreSpace ? 'addSpace' : ''}">${menu}</li>`;
+    });
     mainDivHTML += '</ul>'
     mainDiv.innerHTML = mainDivHTML;
 
@@ -221,10 +242,9 @@ function showMoreOptionsDialogBox(noteId, noteView = false) {
 let moreOptionDialogBoxPresent = false;
 
 // Display More Options Dialog Box
-function makeMoreOptionsIconFunction(noteId = '') {
+function makeMoreOptionsIconFunction(noteId = '', customOption = []) {
 
     function displayMoreOptionDialogBox(event) {
-
         function getNoteId() {
             let note = event.currentTarget;
             for (let i = 0; i < 3; i++) { note = note.parentElement };
@@ -241,7 +261,7 @@ function makeMoreOptionsIconFunction(noteId = '') {
         }
 
         // Show more-option dialog box
-        showMoreOptionsDialogBox(note, noteId ? true : false);
+        showMoreOptionsDialogBox(note, noteId ? true : false, customOption ? customOption : []);
 
         // Menu inside more-option dialog box
         const menuBoxOption = document.body.querySelectorAll('.menu');
@@ -250,6 +270,10 @@ function makeMoreOptionsIconFunction(noteId = '') {
                 // if user clicked "add label" option
                 if (e.target.textContent == "add label") {
                     addLabelInNote(note);
+                } else if (e.target.textContent == "delete note") {
+                    deleteNote(note);
+                } else if (e.target.textContent == "untrash") {
+                    untrashNote(note);
                 }
             })
         })
@@ -340,5 +364,55 @@ function addLabelInNote(noteId) {
     });
 }
 
+function deleteNote(noteId) {
+    const allNotes = JSON.parse(localStorage.getItem('notes'));
+    if (!allNotes) { return }
+
+    let noteToEdit = "";
+    for (let i = 0; i < allNotes.length; i++) {
+        if (allNotes[i].id == noteId) {
+            noteToEdit = allNotes[i];
+            break;
+        }
+    }
+
+    const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
+    updateNote.id = noteId;
+
+    let deleteForever = false;
+    if (updateNote.isTrash) { deleteForever = true }
+    updateNote.trash();
+    updateNote.save();
+
+    if (!deleteForever) {
+        displayAllNotes();
+        makeMoreOptionsIconFunction();
+    } else {
+        displayAllNotes(allNotes.filter((element) => element.isTrash == false && element.isArchive == false));
+        makeMoreOptionsIconFunction('', ["untrash", "delete note"])
+    }
+}
+
+function untrashNote(noteId) {
+    let allNotes = JSON.parse(localStorage.getItem('notes'));
+    if (!allNotes) { return }
+
+    let noteToEdit = "";
+    for (let i = 0; i < allNotes.length; i++) {
+        if (allNotes[i].id == noteId) {
+            noteToEdit = allNotes[i];
+            break;
+        }
+    }
+
+    const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
+    updateNote.id = noteId;
+    updateNote.untrash();
+    updateNote.save();
+
+    allNotes = JSON.parse(localStorage.getItem('notes'));
+    displayAllNotes(allNotes.filter((element) => element.isTrash == true));
+    makeMoreOptionsIconFunction('', ["untrash", "delete note"])
+}
 
 export { updateNote, displayAllNotes, makeMoreOptionsIconFunction, addLabelInNote };

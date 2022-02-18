@@ -63,6 +63,10 @@
     z-index: 1;
 }
 
+.note .note-head .more-icon .menu-container .addSpace{
+    min-width: 110px;
+}
+
 /* More-Option All Options Container */
 .note .note-head .more-icon .menu-container .menu-box {
     display: flex;
