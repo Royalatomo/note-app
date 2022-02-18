@@ -1,5 +1,5 @@
-@import "./helperClass/notes/notes-head.css";
-@import "./helperClass/notes/notes-body.css";
+@import "../helperClass/notes/notes-head.css";
+@import "../helperClass/notes/notes-body.css";
 
 
 /* - Notes Container - */
