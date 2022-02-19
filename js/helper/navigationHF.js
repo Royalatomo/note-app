@@ -17,8 +17,10 @@ function addLabelsToNav() {
         const navLabelElement = document.createElement("li");
         navLabelElement.className = "link label-list";
 
+        const labelIndex = JSON.parse(localStorage.labels).findIndex((element) => element === label)
+
         const navLabelElementLink = document.createElement("a");
-        navLabelElementLink.setAttribute("href", "#");
+        navLabelElementLink.setAttribute("href", `/html/label.html?${labelIndex}`);
 
         const navLabelElementIcon = document.createElement("i");
         navLabelElementIcon.className = "icon fas fa-tag";

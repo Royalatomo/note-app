@@ -83,7 +83,6 @@ function returnNoteViewHTML(note) {
 
     const noteViewArea = document.createElement("section");
     noteViewArea.classList.add("note-view-area");
-    noteViewArea.classList.add("back-screen");
 
     const noteElement = document.createElement('div');
     noteElement.setAttribute('class', 'removeMe')
@@ -289,17 +288,110 @@ function makeRemoveLabel(noteId = "") {
 }
 
 
-function getNoteViewing() {
-    return isNoteViewing;
+function getNoteViewing(set = true) {
+    if (set) { return isNoteViewing; }
+    isNoteViewing = set;
 }
 
-function createNote(){
-    // <i class="fa-solid fa-circle-plus"></i>
+function createNote() {
     const createNoteButton = document.createElement('div');
     createNoteButton.setAttribute('class', 'add-note-container')
-    createNoteButton.innerHTML = '<div class="add-note"></div>';
+    createNoteButton.innerHTML = '<i class="fas fa-plus-circle add-note"></i>';
     document.body.appendChild(createNoteButton);
 
-    
+    function createNoteHtml(note) {
+
+        const noteTitle = note.title;
+        const noteContent = note.content;
+        const noteLabels = note.labels;
+
+
+        const noteCreateArea = document.createElement("section");
+        noteCreateArea.classList.add("note-create-area");
+        noteCreateArea.classList.add("note-view-area");
+
+        const noteElement = document.createElement('div');
+        noteElement.setAttribute('class', 'removeMe')
+        noteElement.setAttribute('id', note.id);
+        noteElement.setAttribute('class', "note");
+
+        noteElement.innerHTML = `
+        <div class="note-head">
+            <h4 contenteditable="true" class="title"></h4>
+            <span class="more-icon"><span class="avoid_MoreOptions more-icon-circles"><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i><i class="avoid_MoreOptions fas fa-circle"></i></span></span>
+        </div>
+        <div class="note-body">
+            <p contenteditable="true" class="content"></p>
+            <div class="note-labels"></div>
+        </div>`;
+
+        noteElement.querySelector('.content').innerHTML = noteContent;
+        noteElement.querySelector('.title').innerHTML = noteTitle;
+
+        noteCreateArea.innerHTML = noteElement.outerHTML;
+        return noteCreateArea;
+    }
+
+    function onEditSaveNote(noteID) {
+        const viewingNoteContainer = document.querySelector('.note-create-area');
+        if (!viewingNoteContainer) { return }
+
+        // whenever note is editied/changed by user save it 
+        viewingNoteContainer.addEventListener('input', (e) => {
+            const viewingNoteInputField = e.target;
+            const viewingNoteInputClass = viewingNoteInputField.classList;
+
+            if (!viewingNoteInputClass.contains('title') && !viewingNoteInputClass.contains('content')) { return }
+
+            // while saving convert "Title/Content" html tags to text format
+            const noteTitle = convertNoteContentHtmlToText(viewingNoteContainer.querySelector('.title').innerHTML);
+            const noteContent = convertNoteContentHtmlToText(viewingNoteContainer.querySelector('.content').innerHTML);
+            const noteLabels = Array.from(viewingNoteContainer.querySelectorAll('.label'));
+
+            const note = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.innerText }));
+            note.id = noteID;
+            note.save();
+        })
+    }
+
+    document.querySelector('.add-note-container').addEventListener('click', () => {
+        const newNote = new Note('New Note Title', 'New Note Content', []);
+        document.body.appendChild(createNoteHtml(newNote));
+        const bodyStyle = document.querySelector("body").style;
+        newNote.save();
+
+        // freeze scrolling
+        bodyStyle.width = "100vw";
+        bodyStyle.height = "100vh";
+        bodyStyle.overflow = "hidden";
+
+        onEditSaveNote(newNote.id);
+        isNoteViewing = true;
+        makeMoreOptionsIconFunction(newNote.id);
+        document.querySelector('.note-create-area .note').addEventListener('click', (e) => {
+            const text = e.target.textContent;
+            if(text == newNote.title || text == newNote.content){
+                e.target.textContent = "";
+            }
+        })
+        
+        document.querySelector(".note-create-area").addEventListener("click", (e) => {
+            if (!e.target.classList.contains("note-create-area")) { return }
+
+            e.currentTarget.remove();
+
+            // unfreeze scrolling
+            bodyStyle.width = "fit-content";
+            bodyStyle.height = "fit-content";
+            bodyStyle.overflow = "visible";
+            isNoteViewing = false;
+
+            // After removing note's label it is refressed and new note instance is made: make new note's buttons functionable
+            makeRemoveLabel();
+            makeMoreOptionsIconFunction();
+        });
+    })
 }
+
+
 export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel, getNoteViewing, createNote }

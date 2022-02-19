@@ -9,7 +9,3 @@
 
 /* Remove Label - Prompt Box */
 @import "./class/prompt-box.css";
-
-.note-create-area .note{
-    width: 95%;
-}

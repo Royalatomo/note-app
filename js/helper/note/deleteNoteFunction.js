@@ -1,5 +1,7 @@
 import { Note } from "../classes.js";
 import { displayAllNotes, makeMoreOptionsIconFunction } from "./noteHF.js";
+import { getNoteViewing, makeRemoveLabel, makeNotesViewable } from "../allHF.js";
+import { showLabeledNotes } from "../../label.js"
 
 
 // Prompt for confiming user deletion
@@ -31,6 +33,21 @@ function promptConfirmationBox(msg) {
     bodyStyle.overflow = "hidden";
 }
 
+function removeNoteView() {
+    if (!getNoteViewing()) { return }
+    document.querySelector('.note-view-area').remove();
+
+    const bodyStyle = document.body.style;
+    // unfreeze scrolling
+    bodyStyle.width = "fit-content";
+    bodyStyle.height = "fit-content";
+    bodyStyle.overflow = "visible";
+    getNoteViewing(false);
+
+    // After removing note's label it is refressed and new note instance is made: make new note's buttons functionable
+    makeRemoveLabel();
+    makeMoreOptionsIconFunction();
+}
 
 function removeNote(noteId) {
     let allSavedNotes = JSON.parse(localStorage.getItem('notes'));
@@ -83,7 +100,7 @@ function removeNote(noteId) {
         })
 
         // If user does not confirms deletion
-        document.querySelector('.prompt .green').addEventListener('click', () => {
+        greenButton.addEventListener('click', () => {
             confirmationPromptBox.remove();
             // Unfreeze scroll
             document.body.style.height = "fit-content";
@@ -93,10 +110,16 @@ function removeNote(noteId) {
         return;
     }
 
-    // send note in trash
-    updateNote.trash();
     // sending note to trash - means user not in trash page
+    updateNote.trash();
+    removeNoteView();
+
+    let pageHtmlName = location.href.split('?')[0].split('/');
+    pageHtmlName = pageHtmlName[pageHtmlName.length - 1];
+    if (pageHtmlName === "label.html") { showLabeledNotes(); return }
+
     displayAllNotes();
+    makeNotesViewable();
     makeMoreOptionsIconFunction();
 }
 
@@ -118,7 +141,6 @@ function untrashNote(noteId) {
     updateNote.id = noteId;
     // remove note from trash
     updateNote.untrash();
-
     // Get updated note list
     allNotes = JSON.parse(localStorage.getItem('notes'));
     // Removing from trash - means user is in trash page

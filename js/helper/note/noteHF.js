@@ -31,7 +31,7 @@ function convertTextToNoteHtml(text) {
 
 
 // display all notes in frontend
-function displayAllNotes(notesList = "") {
+function displayAllNotes(notesList = "all") {
 
     function returnSingleNoteHTML(note) {
 
@@ -83,13 +83,13 @@ function displayAllNotes(notesList = "") {
 
     // if notes given to show then, else show all notes from localStorage
     function getNotesList() {
-        if (!notesList) {
+        if (notesList == 'all') {
             const allNotes = JSON.parse(localStorage.getItem("notes"));
             if (!allNotes) { return '' }
             // show only that notes which are not trashed or archived
             return allNotes.filter((element) => element.isTrash == false && element.isArchive == false);
         }
-        return notesList;
+        return notesList?notesList:[];
     }
     const allSavedNotes = getNotesList();
 
@@ -202,7 +202,7 @@ function showMoreOptionsDialogBox(noteId, noteView = false, customOption = []) {
 
         if (!clickedNoteForMenu.isArchive) {
             moreOptionsMenu.push('archive')
-            moreOptionsMenu.push('delete note')
+            moreOptionsMenu.push('trash note')
         }
     }
 
@@ -270,7 +270,7 @@ function makeMoreOptionsIconFunction(noteId = '', customOption = []) {
                 // if user clicked "add label" option
                 if (e.target.textContent == "add label") {
                     addLabelInNote(note);
-                } else if (e.target.textContent == "delete note") {
+                } else if (e.target.textContent == "delete note" || e.target.textContent == "trash note") {
                     removeNote(note);
                 } else if (e.target.textContent == "untrash") {
                     untrashNote(note);
@@ -305,4 +305,4 @@ function makeMoreOptionsIconFunction(noteId = '', customOption = []) {
     })
 }
 
-export { updateNote, displayAllNotes, makeMoreOptionsIconFunction, addLabelInNote };
+export { updateNote, displayAllNotes, makeMoreOptionsIconFunction };
