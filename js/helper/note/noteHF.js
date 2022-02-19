@@ -365,7 +365,36 @@ function addLabelInNote(noteId) {
 }
 
 function deleteNote(noteId) {
-    const allNotes = JSON.parse(localStorage.getItem('notes'));
+    // Prompt for confiming user deletion
+    function promptConfirmationBox(msg) {
+
+        const existingPromptBox = document.body.querySelector('.prompt');
+        if (existingPromptBox) { existingPromptBox.remove(); }
+
+        // main prompt div
+        const promptBox = document.createElement('div');
+        promptBox.classList.add('prompt');
+
+        promptBox.innerHTML =
+            `<div class="msg-box">
+            <p class="msg">${msg}</p>
+            <div class="msg-button">
+                <button class="red">Yes</button>
+                <button class="green">No</button>
+            </div>
+        </div>`;
+
+        // add promptBox in body
+        document.body.appendChild(promptBox);
+
+        // freeze scrolling
+        const bodyStyle = document.body.style;
+        bodyStyle.height = "100vh";
+        bodyStyle.width = "100vw";
+        bodyStyle.overflow = "hidden";
+    }
+
+    let allNotes = JSON.parse(localStorage.getItem('notes'));
     if (!allNotes) { return }
 
     let noteToEdit = "";
@@ -378,18 +407,44 @@ function deleteNote(noteId) {
 
     const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
     updateNote.id = noteId;
+    updateNote.isTrash = noteToEdit.isTrash;
 
     let deleteForever = false;
     if (updateNote.isTrash) { deleteForever = true }
-    updateNote.trash();
-    updateNote.save();
 
     if (!deleteForever) {
+        updateNote.trash();
         displayAllNotes();
         makeMoreOptionsIconFunction();
     } else {
-        displayAllNotes(allNotes.filter((element) => element.isTrash == false && element.isArchive == false));
-        makeMoreOptionsIconFunction('', ["untrash", "delete note"])
+
+        promptConfirmationBox("Do you want to delete this note forever?");
+        document.querySelector('.menu-container').remove();
+        // User clicked YES in confirmation
+        document.querySelector('.prompt .red').addEventListener('click', () => {
+            document.querySelector('.prompt').remove();
+            updateNote.trash();
+            allNotes = JSON.parse(localStorage.getItem('notes'));
+            displayAllNotes(allNotes.filter((element) => element.isTrash == true));
+            makeMoreOptionsIconFunction('', ["untrash", "delete note"])
+
+            // Unfreeze scroll
+            const bodyStyle = document.body.style;
+            bodyStyle.height = "fit-content";
+            bodyStyle.width = "fit-content";
+            bodyStyle.overflow = "visible";
+        })
+
+        // User clicked NO in confirmation
+        document.querySelector('.prompt .green').addEventListener('click', () => {
+            document.querySelector('.prompt').remove();
+
+            // Unfreeze scroll
+            document.body.style.height = "fit-content";
+            document.body.style.width = "fit-content";
+            document.body.style.overflow = "visible";
+        })
+
     }
 }
 
