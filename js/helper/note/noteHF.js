@@ -1,6 +1,6 @@
 import { makeNotesViewable, makeRemoveLabel } from "../allHF.js";
-import { Note } from "../classes.js";
-import { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel } from "./addLabelFunction.js";
+import { addLabelInNote } from "./addLabelFunction.js";
+import { removeNote, untrashNote } from "./deleteNoteFunction.js";
 
 // NewLine Bug Fix: Takes text for title/content and converts them to html tags (span, br) 
 function convertTextToNoteHtml(text) {
@@ -271,7 +271,7 @@ function makeMoreOptionsIconFunction(noteId = '', customOption = []) {
                 if (e.target.textContent == "add label") {
                     addLabelInNote(note);
                 } else if (e.target.textContent == "delete note") {
-                    deleteNote(note);
+                    removeNote(note);
                 } else if (e.target.textContent == "untrash") {
                     untrashNote(note);
                 }
@@ -303,171 +303,6 @@ function makeMoreOptionsIconFunction(noteId = '', customOption = []) {
             displayMoreOptionDialogBox(e)
         })
     })
-}
-
-
-function addLabelInNote(noteId) {
-
-    let savedLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
-    const menuBox = document.body.querySelector('.menu-box');
-
-    if (!menuBox) { return }
-
-    menuBox.style.minWidth = "130px";
-    menuBox.innerHTML = returnFullAddLabelHTML(savedLabels);
-    checkAlreadyExistingNoteLabels(noteId);
-
-    // Search Bar Text if clicked remove default value
-    const searchText = document.querySelector('.menu-container .search .search-text');
-    searchText.addEventListener('click', (e) => {
-        const searchBar = e.currentTarget;
-        if (searchBar.textContent == "Type Label...") {
-            searchBar.textContent = "";
-        }
-    })
-
-    // Search Bar Text on empty fill with default value
-    const moreOptionDialogBox = document.querySelector('.menu-container');
-    moreOptionDialogBox.addEventListener('click', (e) => {
-        const clickedElementClasses = e.target.classList;
-        if (clickedElementClasses.contains('search') || clickedElementClasses.contains('search-text')) { return }
-        // user clicked outside searchbar - if searchText empty fill with default
-        const searchBar = document.querySelector('.menu-container .search .search-text');
-        if (!searchBar.textContent) { searchBar.textContent = "Type Label..."; }
-    })
-
-    // when user changes Search Bar Text
-    const searchBar = document.querySelector('.search-text');
-    searchBar.addEventListener('input', (e) => {
-
-        // Get Noteid where add label is called
-        let noteId = e.currentTarget;
-        for (let i = 0; i < 6; i++) {
-            noteId = noteId.parentElement;
-        }
-        noteId = noteId.id;
-
-        // if search text is empty
-        if (e.currentTarget.textContent === "") {
-            const labelHTML = returnAllLabelOptionsHtml(savedLabels);
-            document.querySelector('.search-result').innerHTML = labelHTML;
-            checkAlreadyExistingNoteLabels(noteId);
-            return;
-        }
-
-        // if search text not empty
-        const searchFilteredLabels = searchNoteLabel(e.currentTarget.textContent.trim());
-        const labelHTML = returnAllLabelOptionsHtml(searchFilteredLabels);
-        document.querySelector('.search-result').innerHTML = labelHTML;
-        checkAlreadyExistingNoteLabels(noteId);
-        createNoteLabel(noteId, e.currentTarget.textContent.trim());
-    });
-}
-
-function deleteNote(noteId) {
-    // Prompt for confiming user deletion
-    function promptConfirmationBox(msg) {
-
-        const existingPromptBox = document.body.querySelector('.prompt');
-        if (existingPromptBox) { existingPromptBox.remove(); }
-
-        // main prompt div
-        const promptBox = document.createElement('div');
-        promptBox.classList.add('prompt');
-
-        promptBox.innerHTML =
-            `<div class="msg-box">
-            <p class="msg">${msg}</p>
-            <div class="msg-button">
-                <button class="red">Yes</button>
-                <button class="green">No</button>
-            </div>
-        </div>`;
-
-        // add promptBox in body
-        document.body.appendChild(promptBox);
-
-        // freeze scrolling
-        const bodyStyle = document.body.style;
-        bodyStyle.height = "100vh";
-        bodyStyle.width = "100vw";
-        bodyStyle.overflow = "hidden";
-    }
-
-    let allNotes = JSON.parse(localStorage.getItem('notes'));
-    if (!allNotes) { return }
-
-    let noteToEdit = "";
-    for (let i = 0; i < allNotes.length; i++) {
-        if (allNotes[i].id == noteId) {
-            noteToEdit = allNotes[i];
-            break;
-        }
-    }
-
-    const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
-    updateNote.id = noteId;
-    updateNote.isTrash = noteToEdit.isTrash;
-
-    let deleteForever = false;
-    if (updateNote.isTrash) { deleteForever = true }
-
-    if (!deleteForever) {
-        updateNote.trash();
-        displayAllNotes();
-        makeMoreOptionsIconFunction();
-    } else {
-
-        promptConfirmationBox("Do you want to delete this note forever?");
-        document.querySelector('.menu-container').remove();
-        // User clicked YES in confirmation
-        document.querySelector('.prompt .red').addEventListener('click', () => {
-            document.querySelector('.prompt').remove();
-            updateNote.trash();
-            allNotes = JSON.parse(localStorage.getItem('notes'));
-            displayAllNotes(allNotes.filter((element) => element.isTrash == true));
-            makeMoreOptionsIconFunction('', ["untrash", "delete note"])
-
-            // Unfreeze scroll
-            const bodyStyle = document.body.style;
-            bodyStyle.height = "fit-content";
-            bodyStyle.width = "fit-content";
-            bodyStyle.overflow = "visible";
-        })
-
-        // User clicked NO in confirmation
-        document.querySelector('.prompt .green').addEventListener('click', () => {
-            document.querySelector('.prompt').remove();
-
-            // Unfreeze scroll
-            document.body.style.height = "fit-content";
-            document.body.style.width = "fit-content";
-            document.body.style.overflow = "visible";
-        })
-
-    }
-}
-
-function untrashNote(noteId) {
-    let allNotes = JSON.parse(localStorage.getItem('notes'));
-    if (!allNotes) { return }
-
-    let noteToEdit = "";
-    for (let i = 0; i < allNotes.length; i++) {
-        if (allNotes[i].id == noteId) {
-            noteToEdit = allNotes[i];
-            break;
-        }
-    }
-
-    const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
-    updateNote.id = noteId;
-    updateNote.untrash();
-    updateNote.save();
-
-    allNotes = JSON.parse(localStorage.getItem('notes'));
-    displayAllNotes(allNotes.filter((element) => element.isTrash == true));
-    makeMoreOptionsIconFunction('', ["untrash", "delete note"])
 }
 
 export { updateNote, displayAllNotes, makeMoreOptionsIconFunction, addLabelInNote };

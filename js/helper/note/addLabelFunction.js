@@ -1,7 +1,5 @@
 import { makeRemoveLabel, getNoteViewing } from "../allHF.js";
 import { Note } from "../classes.js";
-import { addLabelInNote } from "./noteHF.js"
-
 
 function returnAllLabelOptionsHtml(labelsList) {
     let labelHtmlCombined = '';
@@ -69,11 +67,11 @@ function checkAlreadyExistingNoteLabels(noteId) {
 }
 
 
-function searchNoteLabel(labelToSearch) {
+function searchLabelForNote(labelToSearch) {
     let searchFoundLabels = [];
     const allSavedLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
-    if (!allSavedLabels) { return []; }
 
+    if (!allSavedLabels) { return []; }
     // if search is empty show all available labels to add/remove
     if (!labelToSearch) { return allSavedLabels; }
 
@@ -141,10 +139,8 @@ function createNoteLabel(noteId, labelToAdd) {
             addLabelInNote(noteId);
 
             if (getNoteViewing()) {
-                console.log("HELLO");
                 makeRemoveLabel(noteId);
             } else {
-                console.log("HELLO");
                 makeRemoveLabel();
             }
 
@@ -188,4 +184,63 @@ function createNoteLabel(noteId, labelToAdd) {
 }
 
 
-export { returnAllLabelOptionsHtml, returnFullAddLabelHTML, checkAlreadyExistingNoteLabels, searchNoteLabel, createNoteLabel };
+// Main Function
+function addLabelInNote(noteId) {
+
+    let savedLabels = localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [];
+    const menuBox = document.body.querySelector('.menu-box');
+
+    if (!menuBox) { return }
+
+    menuBox.style.minWidth = "130px";
+    menuBox.innerHTML = returnFullAddLabelHTML(savedLabels);
+    checkAlreadyExistingNoteLabels(noteId);
+
+    // Search Bar Text if clicked remove default value
+    const searchText = document.querySelector('.menu-container .search .search-text');
+    searchText.addEventListener('click', (e) => {
+        const searchBar = e.currentTarget;
+        if (searchBar.textContent == "Type Label...") {
+            searchBar.textContent = "";
+        }
+    })
+
+    // Search Bar Text on empty fill with default value
+    const moreOptionDialogBox = document.querySelector('.menu-container');
+    moreOptionDialogBox.addEventListener('click', (e) => {
+        const clickedElementClasses = e.target.classList;
+        if (clickedElementClasses.contains('search') || clickedElementClasses.contains('search-text')) { return }
+        // user clicked outside searchbar - if searchText empty fill with default
+        const searchBar = document.querySelector('.menu-container .search .search-text');
+        if (!searchBar.textContent) { searchBar.textContent = "Type Label..."; }
+    })
+
+    // when user changes Search Bar Text
+    const searchBar = document.querySelector('.search-text');
+    searchBar.addEventListener('input', (e) => {
+
+        // Get Noteid where add label is called
+        let noteId = e.currentTarget;
+        for (let i = 0; i < 6; i++) {
+            noteId = noteId.parentElement;
+        }
+        noteId = noteId.id;
+
+        // if search text is empty
+        if (e.currentTarget.textContent === "") {
+            const labelHTML = returnAllLabelOptionsHtml(savedLabels);
+            document.querySelector('.search-result').innerHTML = labelHTML;
+            checkAlreadyExistingNoteLabels(noteId);
+            return;
+        }
+
+        // if search text not empty
+        const searchFilteredLabels = searchLabelForNote(e.currentTarget.textContent.trim());
+        const labelHTML = returnAllLabelOptionsHtml(searchFilteredLabels);
+        document.querySelector('.search-result').innerHTML = labelHTML;
+        checkAlreadyExistingNoteLabels(noteId);
+        createNoteLabel(noteId, e.currentTarget.textContent.trim());
+    });
+}
+
+export { addLabelInNote };

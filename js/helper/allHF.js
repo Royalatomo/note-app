@@ -292,4 +292,14 @@ function makeRemoveLabel(noteId = "") {
 function getNoteViewing() {
     return isNoteViewing;
 }
-export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel, getNoteViewing }
+
+function createNote(){
+    // <i class="fa-solid fa-circle-plus"></i>
+    const createNoteButton = document.createElement('div');
+    createNoteButton.setAttribute('class', 'add-note-container')
+    createNoteButton.innerHTML = '<div class="add-note"></div>';
+    document.body.appendChild(createNoteButton);
+
+    
+}
+export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel, getNoteViewing, createNote }
