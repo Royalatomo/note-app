@@ -1,5 +1,6 @@
-import { makeRemoveLabel, getNoteViewing } from "../allHF.js";
+import { makeRemoveLabel, getSetNoteViewing } from "../allHF.js";
 import { Note } from "../classes.js";
+import {removeLabelsFromNav, addLabelsToNav} from "../navigationHF.js";
 
 function returnAllLabelOptionsHtml(labelsList) {
     let labelHtmlCombined = '';
@@ -138,12 +139,15 @@ function createNoteLabel(noteId, labelToAdd) {
             // refresh addLabelInNote Dialog Box
             addLabelInNote(noteId);
 
-            if (getNoteViewing()) {
+            if (getSetNoteViewing()) {
                 makeRemoveLabel(noteId);
             } else {
                 makeRemoveLabel();
             }
 
+            // update label in navigation
+            removeLabelsFromNav();
+            addLabelsToNav();
 
             // remove createButton
             const createButtonContainer = document.body.querySelector('.create-label-container');

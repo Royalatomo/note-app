@@ -4,7 +4,9 @@ import { makeNotesViewable, createNote, makeRemoveLabel } from "./helper/allHF.j
 
 // Populate Notes into notes area
 displayAllNotes();
-createNote();
 makeNotesViewable();
 makeMoreOptionsIconFunction();
 makeRemoveLabel();
+
+// add note create button
+createNote();

@@ -1,6 +1,6 @@
 import { Note } from "../classes.js";
 import { displayAllNotes, makeMoreOptionsIconFunction } from "./noteHF.js";
-import { getNoteViewing, makeRemoveLabel, makeNotesViewable } from "../allHF.js";
+import { getSetNoteViewing, makeRemoveLabel, makeNotesViewable } from "../allHF.js";
 import { showLabeledNotes } from "../../label.js"
 
 
@@ -34,7 +34,7 @@ function promptConfirmationBox(msg) {
 }
 
 function removeNoteView() {
-    if (!getNoteViewing()) { return }
+    if (!getSetNoteViewing()) { return }
     document.querySelector('.note-view-area').remove();
 
     const bodyStyle = document.body.style;
@@ -42,7 +42,7 @@ function removeNoteView() {
     bodyStyle.width = "fit-content";
     bodyStyle.height = "fit-content";
     bodyStyle.overflow = "visible";
-    getNoteViewing(false);
+    getSetNoteViewing(false);
 
     // After removing note's label it is refressed and new note instance is made: make new note's buttons functionable
     makeRemoveLabel();
@@ -116,7 +116,10 @@ function removeNote(noteId) {
 
     let pageHtmlName = location.href.split('?')[0].split('/');
     pageHtmlName = pageHtmlName[pageHtmlName.length - 1];
-    if (pageHtmlName === "label.html") { showLabeledNotes(); return }
+    if (pageHtmlName === "label.html") { 
+        showLabeledNotes();
+        return;
+    }
 
     displayAllNotes();
     makeNotesViewable();

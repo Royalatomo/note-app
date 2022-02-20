@@ -184,7 +184,6 @@ function showMoreOptionsDialogBox(noteId, noteView = false, customOption = []) {
     const clickedNoteForMenu = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteId)[0];
     const noteLabels = clickedNoteForMenu.labels;
     let addMoreSpace = false;
-    console.log('asdfasdfasdf');
 
     if (customOption.length > 0) {
         customOption.forEach((option) => {
