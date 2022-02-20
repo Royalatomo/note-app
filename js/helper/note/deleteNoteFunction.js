@@ -1,7 +1,7 @@
 import { Note } from "../classes.js";
 import { displayAllNotes, makeMoreOptionsIconFunction } from "./noteHF.js";
 import { getSetNoteViewing, makeRemoveLabel, makeNotesViewable } from "../allHF.js";
-import { showLabeledNotes } from "../../label.js"
+import { showLabelFilteredNotes } from "../../label.js"
 
 
 // Prompt for confiming user deletion
@@ -114,13 +114,14 @@ function removeNote(noteId) {
     updateNote.trash();
     removeNoteView();
 
+    // if note is removed from "label.html" page - render all labeled pages again
     let pageHtmlName = location.href.split('?')[0].split('/');
     pageHtmlName = pageHtmlName[pageHtmlName.length - 1];
     if (pageHtmlName === "label.html") { 
-        showLabeledNotes();
+        showLabelFilteredNotes();
         return;
     }
-
+    
     displayAllNotes();
     makeNotesViewable();
     makeMoreOptionsIconFunction();

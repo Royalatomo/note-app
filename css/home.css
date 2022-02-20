@@ -10,6 +10,5 @@
 /* Remove Label - Prompt Box */
 @import "./class/prompt-box.css";
 
-.note-view-area .note{
-    width: 95%;
-}
+/* Create Note Button */
+@import "./helperClass/create-note.css";
