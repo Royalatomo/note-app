@@ -1,4 +1,4 @@
-import { makeRemoveLabel, getSetNoteViewing } from "../allHF.js";
+import { makeRemoveLabel, getSetNoteViewing, fromIdFindNote } from "../allHF.js";
 import { Note } from "../classes.js";
 import {removeLabelsFromNav, addLabelsToNav} from "../navigationHF.js";
 
@@ -25,7 +25,7 @@ function returnFullAddLabelHTML(labelsList) {
 
 // check the label which are already there in note, so that user can see which labels the note already have
 function checkAlreadyExistingNoteLabels(noteId) {
-    const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
+    const note = fromIdFindNote(noteId);
     const noteLabels = note.labels;
 
     // label which user see's inside addLabelInNote option
@@ -45,11 +45,13 @@ function checkAlreadyExistingNoteLabels(noteId) {
         labelCheckBox.addEventListener('change', (e) => {
 
             // get note which refreshed labels (if added/removed labels)
-            const note = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
+            const note = fromIdFindNote(noteId);
 
             // new note to update existing note (localStorage)
             const updateNote = new Note(note.title, note.content, note.labels);
             updateNote.id = noteId;
+            updateNote.isArchive = note.isArchive;
+            updateNote.isTrash = note.isTrash;
 
             const checkboxLabelText = e.currentTarget.parentElement.lastElementChild.textContent;
             if (e.currentTarget.checked) {
@@ -127,9 +129,11 @@ function createNoteLabel(noteId, labelToAdd) {
             if (labelAlreadyExists !== -1) { return }
 
             // if label not already exists
-            const noteToUpdate = JSON.parse(localStorage.getItem('notes')).filter((note) => note.id == noteId)[0];
+            const noteToUpdate = fromIdFindNote(noteId);
             const updatedNote = new Note(noteToUpdate.title, noteToUpdate.content, [...noteToUpdate.labels, labelToCreate]);
             updatedNote.id = noteToUpdate.id;
+            updatedNote.isArchive = noteToUpdate.isArchive;
+            updatedNote.isTrash = noteToUpdate.isTrash
 
             // add newly added label to allLabels (localStorage)
             const newLabels = [...localStorage.getItem('labels') ? JSON.parse(localStorage.getItem('labels')) : [], labelToCreate]

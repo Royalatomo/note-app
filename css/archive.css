@@ -1,0 +1,14 @@
+/* Navbar - Css */
+@import "./class/navbar.css";
+
+/* Notes - Css */
+@import "./class/notes.css";
+
+/* Notes-view - Css */
+@import "./class/note-view.css";
+
+/* Remove Label - Prompt Box */
+@import "./class/prompt-box.css";
+
+/* Create Note Button */
+@import "./helperClass/create-note.css";

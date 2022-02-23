@@ -1,5 +1,14 @@
 import { Note } from "./classes.js";
 import { makeMoreOptionsIconFunction } from "./note/noteHF.js";
+import { showLabelFilteredNotes } from "../label.js"
+
+function fromIdFindNote(noteId) {
+    const allStoredNotes = localStorage.getItem('notes');
+    let note = JSON.parse(allStoredNotes);
+    if (!note) { return false; }
+    note = note.filter((note) => note.id == noteId)[0];
+    return note;
+}
 
 // NewLine Bug Fix: Takes innerHtml(span, br) and converts it to text with newline (\n)
 function convertNoteContentHtmlToText(html) {
@@ -121,6 +130,7 @@ function makeNotesViewable() {
         viewingNoteContainer.addEventListener('input', (e) => {
             const viewingNoteInputField = e.target;
             const viewingNoteInputClass = viewingNoteInputField.classList;
+            const noteFromStorage = fromIdFindNote(noteID)
 
             if (!viewingNoteInputClass.contains('title') && !viewingNoteInputClass.contains('content')) { return }
 
@@ -129,9 +139,11 @@ function makeNotesViewable() {
             const noteContent = convertNoteContentHtmlToText(viewingNoteContainer.querySelector('.content').innerHTML);
             const noteLabels = Array.from(viewingNoteContainer.querySelectorAll('.label'));
 
-            const note = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.innerText }));
-            note.id = noteID;
-            note.save();
+            const updateNote = new Note(noteTitle, noteContent, noteLabels.map((label) => { return label.innerText }));
+            updateNote.id = noteID;
+            updateNote.isTrash = noteFromStorage.isTrash;
+            updateNote.isArchive = noteFromStorage.isArchive;
+            updateNote.save();
         })
     }
 
@@ -173,6 +185,14 @@ function makeNotesViewable() {
                 bodyStyle.height = "fit-content";
                 bodyStyle.overflow = "visible";
                 isNoteViewing = false;
+
+                // if note is removed from "label.html" page - render all labeled pages again
+                let pageHtmlName = location.href.split('?')[0].split('/');
+                pageHtmlName = pageHtmlName[pageHtmlName.length - 1];
+                if (pageHtmlName === "label.html") {
+                    showLabelFilteredNotes();
+                    return;
+                }
 
                 // After removing note's label it is refressed and new note instance is made: make new note's buttons functionable
                 makeRemoveLabel();
@@ -239,11 +259,24 @@ function makeRemoveLabel(noteId = "") {
         }
 
         newNote.id = noteId ? noteId : note.id;
+        const noteFromStorage = fromIdFindNote(noteId ? noteId : note.id);
+        newNote.isTrash = noteFromStorage.isTrash;
+        newNote.isArchive = noteFromStorage.isArchive;
         newNote.save();
 
         // when note is not in view mode and label is removed it is refressed and
         // a new instance is made so make that instance's button functionable 
-        if (!noteId) { makeRemoveLabel() }
+        if (!noteId) {
+            // if note is removed from "label.html" page - render all labeled pages again
+            let pageHtmlName = location.href.split('?')[0].split('/');
+            pageHtmlName = pageHtmlName[pageHtmlName.length - 1];
+            if (pageHtmlName === "label.html") {
+                showLabelFilteredNotes();
+                return;
+            }
+
+            makeRemoveLabel()
+        }
     }
 
 
@@ -306,6 +339,7 @@ function createNote() {
         viewingNoteContainer.addEventListener('input', (e) => {
             const viewingNoteInputField = e.target;
             const viewingNoteInputClass = viewingNoteInputField.classList;
+            const noteFromStorage = fromIdFindNote(noteID);
 
             // save only when user is editing "Title" or "Content" of the note
             if (!viewingNoteInputClass.contains('title') && !viewingNoteInputClass.contains('content')) { return }
@@ -328,7 +362,6 @@ function createNote() {
     createNoteButton.innerHTML = '<i class="fas fa-plus-circle add-note"></i>';
 
     document.body.appendChild(createNoteButton);
-
     const createNoteButtonElement = document.querySelector('.add-note-container');
     createNoteButtonElement.addEventListener('click', () => {
         // Save note with default values
@@ -382,4 +415,4 @@ function createNote() {
 }
 
 
-export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel, getSetNoteViewing, createNote }
+export { returnNoteViewHTML, makeNotesViewable, makeRemoveLabel, getSetNoteViewing, createNote, fromIdFindNote }

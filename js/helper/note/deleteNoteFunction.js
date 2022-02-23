@@ -2,6 +2,7 @@ import { Note } from "../classes.js";
 import { displayAllNotes, makeMoreOptionsIconFunction } from "./noteHF.js";
 import { getSetNoteViewing, makeRemoveLabel, makeNotesViewable } from "../allHF.js";
 import { showLabelFilteredNotes } from "../../label.js"
+import { showArchivedNotes } from "../../archive.js"
 
 
 // Prompt for confiming user deletion
@@ -65,6 +66,7 @@ function removeNote(noteId) {
     const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
     updateNote.id = noteId;
     updateNote.isTrash = noteToEdit.isTrash;
+    updateNote.isArchive = noteToEdit.isArchive;
 
     // if note already trashed, then delete it completly
     if (updateNote.isTrash) {
@@ -120,6 +122,9 @@ function removeNote(noteId) {
     if (pageHtmlName === "label.html") { 
         showLabelFilteredNotes();
         return;
+    }else if(pageHtmlName == "archive.html") {
+        showArchivedNotes();
+        return;
     }
     
     displayAllNotes();
@@ -143,6 +148,7 @@ function untrashNote(noteId) {
 
     const updateNote = new Note(noteToEdit.title, noteToEdit.content, noteToEdit.labels);
     updateNote.id = noteId;
+    updateNote.isArchive = noteToEdit.isArchive;
     // remove note from trash
     updateNote.untrash();
     // Get updated note list

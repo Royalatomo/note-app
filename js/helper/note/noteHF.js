@@ -1,6 +1,7 @@
-import { makeNotesViewable, makeRemoveLabel } from "../allHF.js";
+import { makeNotesViewable, makeRemoveLabel, fromIdFindNote } from "../allHF.js";
 import { addLabelInNote } from "./addLabelFunction.js";
 import { removeNote, untrashNote } from "./deleteNoteFunction.js";
+import { toggelArchiveNote } from "./archivingFunction.js";
 
 // NewLine Bug Fix: Takes text for title/content and converts them to html tags (span, br) 
 function convertTextToNoteHtml(text) {
@@ -89,7 +90,7 @@ function displayAllNotes(notesList = "all") {
             // show only that notes which are not trashed or archived
             return allNotes.filter((element) => element.isTrash == false && element.isArchive == false);
         }
-        return notesList?notesList:[];
+        return notesList ? notesList : [];
     }
     const allSavedNotes = getNotesList();
 
@@ -121,10 +122,7 @@ function displayAllNotes(notesList = "all") {
 
 // Update individual note on frontEnd
 function updateNote(noteId) {
-
-    const allSavedNotes = JSON.parse(localStorage.getItem("notes"));
-    const updatingNote = allSavedNotes.filter((note) => note.id == noteId)[0];
-
+    const updatingNote = fromIdFindNote(noteId);
     if (!updatingNote) { return }
 
     // Get old note from DOM
@@ -181,7 +179,7 @@ function updateNote(noteId) {
 // Function for displaying more-options
 function showMoreOptionsDialogBox(noteId, noteView = false, customOption = []) {
     const moreOptionsMenu = [];
-    const clickedNoteForMenu = JSON.parse(localStorage.getItem('notes')).filter((n) => n.id == noteId)[0];
+    const clickedNoteForMenu = fromIdFindNote(noteId);
     const noteLabels = clickedNoteForMenu.labels;
     let addMoreSpace = false;
 
@@ -273,6 +271,10 @@ function makeMoreOptionsIconFunction(noteId = '', customOption = []) {
                     removeNote(note);
                 } else if (e.target.textContent == "untrash") {
                     untrashNote(note);
+                } else if (e.target.textContent == "archive") {
+                    toggelArchiveNote(note);
+                } else if (e.target.textContent == "unarchive") {
+                    toggelArchiveNote(note);
                 }
             })
         })
